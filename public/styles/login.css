@@ -1,0 +1,143 @@
+* {
+    box-sizing: border-box;
+    padding: 0;
+    margin: 0;
+}
+
+body {
+    background-color: black;
+}
+
+/* Navigation Styles */
+header {
+    width: 100vw;
+    height: 10vh;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+header #logo {
+    color: goldenrod;
+    font-size: 2em;
+    margin-left: 1em;
+    text-decoration: none;
+}
+
+nav {
+    width: 30vw;
+    display: flex;
+    justify-content: space-evenly;
+}
+
+nav a {
+    color: white;
+    text-decoration: none;
+    transition: color 0.2s ease-out;
+}
+
+nav a:hover {
+    color: gold;
+}
+
+nav button {
+    width: 3em;
+    background-color: rgb(215, 207, 164);
+    color: black;
+    font-size: 1em;
+    letter-spacing: 0.1em;
+    border: 1px solid whitesmoke;
+    border-radius: 1em;
+    box-shadow: 0 0;
+    transition: box-shadow 0.1s ease-out;
+}
+
+nav button:hover {
+    box-shadow: 0px 0px 4px 2px gold;
+}
+
+#initials-container {
+    display: flex;
+    flex-direction: column;
+}
+
+#initials {
+    color: black;
+}
+
+#sign-out {
+    opacity: 0;
+    transition: opacity 0.3s ease-out;
+}
+
+nav button:hover + #sign-out,
+nav #initials-container:hover {
+    opacity: 100;
+}
+
+/*----------------------------------------------------------
+---------- Main Styles -------------------------------------
+-----------------------------------------------------------*/
+main {
+    display: flex;
+    justify-content: center;
+}
+
+form {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 10em;
+}
+
+form div {
+    margin: 0.5em 0;
+    align-self: flex-start;
+}
+
+form label {
+    color: white;
+}
+
+form p {
+    color: white;
+}
+
+form p a {
+    color: rgb(202, 184, 136);
+}
+
+form p a:hover {
+    color: rgb(241, 239, 233);
+}
+
+form a {
+    text-decoration: none;
+    color: white;
+    transition: color 0.2s ease-out;
+}
+
+form a:hover {
+    color: gold;
+}
+
+#submit {
+    width: 4.5em;
+    padding: 0.2em;
+    margin: 1em 0;
+    background-color: rgb(160, 183, 160);
+    color: darkslategrey;
+    box-shadow: 0 0 0 0;
+    transition: color 0.2s ease-out, box-shadow 0.2s ease-out;
+}
+
+#submit:hover {
+    box-shadow: 0 0 10px 2px;
+    color: whitesmoke;
+    cursor: pointer;
+}
+
+#welcome {
+    color: greenyellow;
+    font-size: 2em;
+}

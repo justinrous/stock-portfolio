@@ -1,0 +1,50 @@
+<main>
+    <section>
+        <div>
+            <h2>Portfolio</h2>
+            <table>
+                <tbody>
+                    {{#if portfolio}}
+                    <thead>
+                        <th>Stock Ticker</th>
+                        <th>Quantity of Shares</th>
+                    </thead>
+                    {{#each portfolio}}
+                    <tr>
+                        {{#each this}}
+                        <td>{{this}}</td>
+                        {{/each}}
+                        <td><a class="delete-stock-from-portfolio" href="/deleteStockFromPortfolio">DELETE</a></td>
+                    </tr>
+                    {{/each}}
+                    {{/if}}
+                </tbody>
+            </table>
+            <button class="add-stock-portfolio-button">Add Stock +</button>
+        </div>
+    </section>
+    <section>
+        <div>
+            <h2>Watch List</h2>
+            <table>
+                <tbody>
+                    {{#if watchlist}}
+                    <thead>
+                        <th>Stock Ticker</th>
+                    </thead>
+                    {{#each watchlist}}
+                    <tr>
+                        {{#each this}}
+                        <td>{{this}}</td>
+                        <td><a class="delete-stock-from-watchlist" href="/deleteStockFromWatchlist">DELETE</a></td>
+                        {{/each}}
+                    </tr>
+                    {{/each}}
+                    {{/if}}
+                </tbody>
+            </table>
+            <button class="add-stock-watchlist-button">Add Stock +</button>
+        </div>
+    </section>
+    <script src="./scripts/portfolio.js"></script>
+</main>
