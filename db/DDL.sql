@@ -24,4 +24,15 @@ CREATE TABLE IF NOT EXISTS watchList (
     FOREIGN KEY (userId) REFERENCES users(id)
 );
 
+CREATE TABLE IF NOT EXISTS stockPrices (
+    ticker VARCHAR(20) NOT NULL,
+    stockDate DATE NOT NULL, 
+    openPrice decimal(15, 2) NOT NULL, 
+    highPrice decimal(15, 2) NOT NULL, 
+    lowPrice decimal(15, 2) NOT NULL, 
+    closePrice decimal(15, 2) NOT NULL, 
+    volume decimal(15, 2) NOT NULL, 
+    PRIMARY KEY (ticker, stockDate)
+);
+
 SET FOREIGN_KEY_CHECKS = 1;

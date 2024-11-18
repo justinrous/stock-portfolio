@@ -8,6 +8,8 @@ const db = require('./db/database.js');
 const session = require('express-session');
 const { hash } = require('crypto');
 const bcrypt = require('bcrypt');
+const stockScripts = require('./stock_scripts/stocks.js');
+const { watch } = require('fs');
 
 const app = express();
 const PORT = 5000;
@@ -126,9 +128,36 @@ app.get('/portfolio', async (req, res) => {
         // Get user portfolio
         portfolio = await db.getUserPortfolio(id);
 
+        // Get price for each ticker in portfolio
+        await (async () => {
+            for (let stock of portfolio) {
+                let currentPrice = await stockScripts.getStockPrice(stock.ticker);
+                stock.currentPrice = currentPrice;
+            }
+        })();
+
+
         watchlist = await db.getUserWatchlist(id);
 
+        // Get price for each ticker in watchlist
+        await (async () => {
+            for (let stock of watchlist) {
+                let currentPrice = await stockScripts.getStockPrice(stock.ticker);
+                stock.currentPrice = currentPrice;
+                console.log(`Current price for ${stock.ticker} is ${currentPrice}`)
+            }
+        })();
+        console.log("This is the current watchlist", watchlist)
+
         initials = await db.getInitials(req.session.email);
+
+        /*
+        // Get stock Price for each stock in portfolio
+        for (let stock of portfolio) {
+            let ticker = stock["ticker"];
+
+        }*/
+
 
     }
 
@@ -188,7 +217,9 @@ app.delete('/deleteStockFromPortfolio', async (req, res) => {
 app.delete('/deleteStockFromWatchlist', async (req, res) => {
     // Call Delete Method 
     let id = await db.getUserId(req.session.email);
+    console.log(id)
     let params = { id: id, ticker: req.body.ticker };
+    console.log(params)
     let result = await db.deleteStockFromWatchlist(params);
     if (result.affectedRows == 1) {
         res.json({ success: true, message: "Stock deleted from watchlist" })
@@ -197,6 +228,9 @@ app.delete('/deleteStockFromWatchlist', async (req, res) => {
         res.send("Error deleting stock")
     }
 })
+
+// Stocks table queries 
+
 
 
 app.listen(PORT, () => {

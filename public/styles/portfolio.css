@@ -136,9 +136,19 @@ section button {
     margin-top: 1em;
 }
 
+table a {
+    color: rgb(96, 73, 13);
+    text-decoration: none;
+}
+
+table a:hover {
+    color: whitesmoke;
+}
+
 /* Dynamic Form styling */
 form {
     background-color: rgb(215, 197, 152);
+    position: relative;
 }
 
 form label {
@@ -158,4 +168,26 @@ form label {
 .add-stock-portfolio-button:hover {
     color: rgb(12, 95, 12);
     box-shadow: 0 0 5px 5px rgb(12, 95, 12);
+}
+
+.new-div {
+    position: absolute;
+    top: 0;
+    background-color: rgb(251, 206, 91);
+}
+
+.new-div span {
+    margin: 0em 1em;
+    color: rgb(12, 134, 12);
+    font-weight: 500;
+}
+
+.new-div span:hover {
+    color: rgb(237, 232, 221);
+    cursor: pointer;
+}
+
+.new-div2 {
+    display: flex;
+    justify-content: space-evenly;
 }

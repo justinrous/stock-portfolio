@@ -120,17 +120,77 @@ async function addStockToWatchList({ userId, ticker }) {
 }
 
 async function deleteStockFromPortfolio({ id, ticker }) {
-    let query = "DELETE FROM holdings WHERE userId = ? AND ticker = ? "
+    let query = "DELETE FROM holdings WHERE userId = ? AND ticker = ?"
     let [result] = await connection.query(query, [id, ticker])
     return result;
 }
 
 async function deleteStockFromWatchlist({ id, ticker }) {
-    let query = "DELETE FROM watchlist WHERE userId = ? AND ticker = ? "
-    let [result] = await connection.query(query, [id, ticker])
-    return result;
+    try {
+        let query = "DELETE FROM watchlist WHERE userId = ? AND ticker = ?"
+        let [result] = await connection.query(query, [id, ticker])
+        return result;
+    }
+    catch (err) {
+        console.log("Error removing stock from watclist: ", err)
+    }
+
 }
 
+
+// currentStockPrice table in database
+
+async function addCurrentStockPrice([ticker, date, stockArray]) {
+    try {
+        let query = "INSERT INTO stockPrices(ticker, stockDate, openPrice, highPrice, lowPrice, closePrice, volume) VALUES" +
+            "(?, ?, ?, ?, ?, ?, ?)"
+        let [openPrice, highPrice, lowPrice, closePrice, volume] = stockArray;
+
+        let [result] = await connection.query(query, [ticker, date, openPrice, highPrice, lowPrice, closePrice, volume]);
+        console.log("Result from storing to database: ", result.affectedRows)
+        if (result.affectedRows > 0) {
+            return result.affectedRows;
+        }
+        else {
+            return "Query unsuccessful"
+        }
+    }
+    catch (err) {
+        console.log("Error adding stock prices to database", err)
+    }
+}
+
+async function getCurrentStockPrice(ticker, date = null) {
+    try {
+        if (date == null) {
+            let query = "SELECT openPrice FROM stockPrices WHERE ticker = ?";
+            let [[result]] = await connection.query(query, ticker)
+            if (result) {
+                let price = result["openPrice"];
+                return price;
+            }
+            else {
+                return null;
+            }
+        }
+        else {
+            let query = "SELECT openPrice FROM stockPrices WHERE ticker = ? AND stockDate = ?";
+            let [[result]] = await connection.query(query, [ticker, date])
+            if (!result || result.length == 0) {
+                return null;
+            }
+            else {
+                let price = result["openPrice"]
+                console.log("Result from retrieving stock price from database: ", price)
+                return price;
+            }
+        }
+    }
+    catch (err) {
+        console.log("Error retrieving stock from database: ", err)
+    }
+
+}
 
 
 exports.addUser = addUser;
@@ -143,6 +203,8 @@ exports.getUserPortfolio = getUserPortfolio;
 exports.getUserWatchlist = getUserWatchlist;
 exports.deleteStockFromPortfolio = deleteStockFromPortfolio;
 exports.deleteStockFromWatchlist = deleteStockFromWatchlist;
+exports.addCurrentStockPrice = addCurrentStockPrice;
+exports.getCurrentStockPrice = getCurrentStockPrice;
 
 
 
