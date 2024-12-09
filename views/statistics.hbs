@@ -1,0 +1,66 @@
+<main>
+    <h1>Stock Statistics</h1>
+    <form action="/statistics" method="POST">
+        <fieldset>
+            <legend>Search by stock ticker to review stasitical financial data</legend>
+            <div>
+                <label for="ticker">Stock Ticker: </label>
+                <input type="text" name="ticker" id="ticker">
+            </div>
+            <input type="submit">
+        </fieldset>
+    </form>
+    <section>
+        {{#if statistics}}
+        <table>
+            <thead>
+                <th colspan="2">{{ticker}}</th>
+            </thead>
+            {{#with statistics}}
+            <tbody>
+                <tr>
+                    <th>PE Ratio</th>
+                    <td>{{peRatio}}</td>
+                </tr>
+                <tr>
+                    <th>Earnings per Share (EPS)</th>
+                    <td>{{eps}}</td>
+                </tr>
+                <tr>
+                    <th>Operating Margin</th>
+                    <td>{{operatingMargin}}</td>
+                </tr>
+                <tr>
+                    <th>Sales per Share (SPS)</th>
+                    <td>{{salesPerShare}}</td>
+                </tr>
+                <tr>
+                    <th>Fifty-two Week High</th>
+                    <td>{{fiftyTwoWeekHigh}}</td>
+                </tr>
+                <tr>
+                    <th>Fifty-two Week Low</th>
+                    <td>{{fiftyTwoWeekLow}}</td>
+                </tr>
+                <tr>
+                    <th>Dividend Yield</th>
+                    <td>{{dividendYield}}</td>
+                </tr>
+                <tr>
+                    <th>marketCap</th>
+                    <td>{{marketCap}}</td>
+                </tr>
+                <tr>
+                    <th>Revenue Growth (Quarterly)</th>
+                    <td>{{quarterlyRevenueGrowth}}</td>
+                </tr>
+            </tbody>
+            {{/with}}
+        </table>
+        <div class="dividend-container">
+            <button class="dividend-button">Dividend Tracker</button>
+        </div>
+        {{/if}}
+    </section>
+    <script src="./scripts/statistics.js"> </script>
+</main>

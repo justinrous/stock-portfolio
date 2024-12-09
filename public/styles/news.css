@@ -1,14 +1,16 @@
 * {
     box-sizing: border-box;
-    padding: 0;
     margin: 0;
+    padding: 0;
 }
 
 body {
     background-color: black;
 }
 
-/* Navigation Styles */
+/* ------------------------------------------------------------------
+--------------  Navigation Styles-------------------------------------
+---------------------------------------------------------------------*/
 header {
     width: 100vw;
     height: 10vh;
@@ -101,45 +103,88 @@ nav #initials-container:hover #sign-out {
     opacity: 100;
 }
 
-/* Main Styles */
-main {
+/* ------------------------------------------------------------------------
+----------------- Main Styles ---------------------------------------------
+-------------------------------------------------------------------------*/
+form {
+    color: whitesmoke;
     display: flex;
     flex-direction: column;
     align-items: center;
 }
 
-h1 {
-    color: rgb(31, 190, 50);
-    width: 100vw;
-    text-align: center;
-    text-shadow: 1px 1px 2px rgb(215, 193, 143);
-    margin: 2em 0;
+form h1 {
+    color: green;
 }
 
-.table-container {
-    width: 80vw;
-    height: 30vh;
-    overflow: scroll;
-    overflow-x: hidden;
+form fieldset {
+    display: flex;
+    flex-direction: column;
+    padding: 1em;
+    margin: 1em;
 }
 
-table {
-    width: 75vw;
-    border-collapse: collapse;
-    padding: 0 4em;
+form legend {
+    padding: 0 1em;
+    color: lightgoldenrodyellow;
 }
 
-th {
+input[type="submit"] {
+    color: rgb(5, 69, 9);
+    align-self: center;
+    margin-top: 1em;
+    padding: 0.3em;
+    background-color: antiquewhite;
+}
+
+input[type="submit"]:hover {
+    color: rgb(104, 80, 20);
+    box-shadow: 0 0 1px 2px rgb(195, 195, 51);
+    cursor: pointer;
+}
+
+input[type="submit"]:active {
+    color: lightgoldenrodyellow;
+}
+
+section {
+    display: flex;
+    flex-direction: column;
+    color: whitesmoke;
+    align-items: center;
+}
+
+section div {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin: 1.5em;
+}
+
+div .headline {
+    color: green;
+    font-size: 1.2em;
+}
+
+div img {
+    width: 50em;
+    height: 30em;
+}
+
+div .summary {
+    width: 50em;
+}
+
+section div * {
     padding: 1em 0;
-    font-size: 1em;
-    color: rgb(203, 169, 89);
-    width: auto;
 }
 
-td {
-    padding: 1em 0;
-    font-size: 1em;
-    color: rgb(222, 215, 198);
-    text-align: center;
-    width: auto;
+div a {
+    text-decoration: none;
+    color: lightgoldenrodyellow;
+}
+
+div a:hover {
+    text-decoration: none;
+    color: rgb(44, 44, 8);
 }

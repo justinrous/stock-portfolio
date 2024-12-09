@@ -20,7 +20,7 @@ CREATE TABLE IF NOT EXISTS holdings (
 
 CREATE TABLE IF NOT EXISTS watchList (
     userId int NOT NULL, 
-    ticker varchar(20) NOT NULL unique, 
+    ticker varchar(20) NOT NULL, 
     FOREIGN KEY (userId) REFERENCES users(id)
 );
 
@@ -33,6 +33,16 @@ CREATE TABLE IF NOT EXISTS stockPrices (
     closePrice decimal(15, 2) NOT NULL, 
     volume decimal(15, 2) NOT NULL, 
     PRIMARY KEY (ticker, stockDate)
+);
+
+CREATE TABLE IF NOT EXISTS earnings (
+    id INT AUTO_INCREMENT,
+    earningsDate DATE NOT NULL, 
+    companyName VARCHAR(100), 
+    epsEstimate decimal(10, 8),
+    revenueEstimate BIGINT,
+    symbol VARCHAR(20),
+    PRIMARY KEY (id)
 );
 
 SET FOREIGN_KEY_CHECKS = 1;

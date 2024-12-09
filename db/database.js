@@ -89,6 +89,7 @@ async function getUserWatchlist(id) {
     try {
         let query = "SELECT ticker FROM watchlist WHERE userId = ?";
         let [result] = await connection.query(query, [id]);
+        console.log("Watchlist result in db getwatchlist: ", result)
         return result;
     }
     catch (err) {
@@ -147,7 +148,6 @@ async function addCurrentStockPrice([ticker, date, stockArray]) {
         let [openPrice, highPrice, lowPrice, closePrice, volume] = stockArray;
 
         let [result] = await connection.query(query, [ticker, date, openPrice, highPrice, lowPrice, closePrice, volume]);
-        console.log("Result from storing to database: ", result.affectedRows)
         if (result.affectedRows > 0) {
             return result.affectedRows;
         }
@@ -181,7 +181,6 @@ async function getCurrentStockPrice(ticker, date = null) {
             }
             else {
                 let price = result["openPrice"]
-                console.log("Result from retrieving stock price from database: ", price)
                 return price;
             }
         }
@@ -192,6 +191,38 @@ async function getCurrentStockPrice(ticker, date = null) {
 
 }
 
+async function addEarnings(earnings) {
+    try {
+        for (let company of earnings) {
+            let query = "INSERT INTO earnings (earningsDate, companyName, epsEstimate, revenueEstimate, symbol) VALUES (?, ?, ?, ?, ?)"
+            let [result] = await connection.query(query, [company.date, company.companyName, company.epsEstimate, company.revenueEstimate, company.symbol])
+            if (result.affectedRows != 1) {
+                console.log(`Couldn't add ${earnings.companyName} to database`)
+            }
+        }
+        return result.affectedRows;
+    }
+    catch (err) {
+        console.log("Error adding earnings to db", err);
+        return false;
+    }
+}
+
+async function getEarnings(date) {
+    try {
+        let query = "SELECT * FROM earnings WHERE earningsDate = ?"
+        let [result] = await connection.query(query, [date])
+        if (result.length === 0) {
+            return null;
+        }
+        else {
+            return result;
+        }
+    }
+    catch (err) {
+        console.log("Error retrieving earnings data from database: ", err)
+    }
+}
 
 exports.addUser = addUser;
 exports.compareCreds = compareCreds;
@@ -205,6 +236,8 @@ exports.deleteStockFromPortfolio = deleteStockFromPortfolio;
 exports.deleteStockFromWatchlist = deleteStockFromWatchlist;
 exports.addCurrentStockPrice = addCurrentStockPrice;
 exports.getCurrentStockPrice = getCurrentStockPrice;
+exports.addEarnings = addEarnings;
+exports.getEarnings = getEarnings;
 
 
 

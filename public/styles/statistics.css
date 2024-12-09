@@ -1,0 +1,233 @@
+ * {
+     box-sizing: border-box;
+     margin: 0;
+     padding: 0;
+ }
+
+ body {
+     background-color: black;
+ }
+
+ /* ------------------------------------------------------------------
+--------------  Navigation Styles-------------------------------------
+---------------------------------------------------------------------*/
+ header {
+     width: 100vw;
+     height: 10vh;
+     display: flex;
+     justify-content: space-between;
+     align-items: center;
+ }
+
+ header #logo {
+     color: goldenrod;
+     font-size: 2em;
+     margin-left: 1em;
+     text-decoration: none;
+ }
+
+ nav {
+     width: 30vw;
+     display: flex;
+     justify-content: space-evenly;
+ }
+
+ nav a {
+     color: white;
+     text-decoration: none;
+     transition: color 0.2s ease-out;
+ }
+
+ nav a:hover {
+     color: gold;
+ }
+
+ nav button {
+     width: 3em;
+     background-color: rgb(215, 207, 164);
+     color: black;
+     font-size: 1em;
+     letter-spacing: 0.1em;
+     border: 1px solid whitesmoke;
+     border-radius: 1em;
+     box-shadow: 0 0;
+     transition: box-shadow 0.1s ease-out;
+ }
+
+ nav button:hover {
+     box-shadow: 0px 0px 4px 2px gold;
+ }
+
+ nav .portfolio-container {
+     display: flex;
+     flex-direction: column;
+     position: relative;
+ }
+
+ .portfolio-container div {
+     color: rgb(134, 102, 23);
+     background-color: white;
+     border: 1px solid goldenrod;
+     padding: 2em 2em;
+     position: absolute;
+     width: 10em;
+     top: 3em;
+     opacity: 0;
+     transition: opacity 0.3s ease-out;
+ }
+
+ nav #portfolio-btn {
+     align-self: center;
+ }
+
+ .portfolio-container #portfolio-btn:hover + div {
+     opacity: 1;
+ }
+
+ #initials-container {
+     display: flex;
+     flex-direction: column;
+ }
+
+ #initials {
+     color: black;
+ }
+
+ #sign-out {
+     opacity: 0;
+     transition: opacity 0.3s ease-out;
+     margin: 0.2em 0;
+ }
+
+ nav #initials-container:hover #sign-out {
+     opacity: 100;
+ }
+
+ /***************************************************************************
+************* Main Styles ***************************************************
+****************************************************************************/
+ main {
+     color: whitesmoke;
+     display: flex;
+     flex-direction: column;
+     align-items: center;
+ }
+
+ section {
+     display: flex;
+     justify-content: flex-start;
+     align-items: start;
+ }
+
+ /* ------------------ Form Styles ------------------- */
+ form {
+     padding: 20px;
+ }
+
+ fieldset {
+     padding: 20px;
+     display: flex;
+     flex-direction: column;
+ }
+
+ legend {
+     padding: 0px 10px;
+ }
+
+ fieldset div {}
+
+ form {}
+
+ input {
+     color: black;
+ }
+
+ input[type="submit"] {
+     padding: 0.3em;
+     background-color: #fefae0;
+     color: #283618;
+     text-align: center;
+     align-self: center;
+     margin-top: 20px;
+ }
+
+ input[type="submit"]:hover {
+     cursor: pointer;
+     background-color: #fefae0;
+     color: #97d154;
+     box-shadow: 0px 0px 2px 1px #97d154;
+ }
+
+ input[type="submit"]:active {
+     cursor: pointer;
+     background-color: #fefae0;
+     color: #1a2909;
+     box-shadow: 0px 0px 2px 1px #acd67c;
+ }
+
+ /* ----------- Table Styles --------------------*/
+ table {
+     padding: 2em;
+     margin-right: auto;
+     margin-left: auto;
+ }
+
+ thead th {
+     color: #304e0f;
+     text-shadow: 0 0 0.5px 0.5px;
+     font-size: 1.5em;
+ }
+
+ th,
+ td {
+     padding: 0.5em 1.5em;
+ }
+
+ .dividend-container {
+     float: right;
+ }
+
+ .dividend-button {
+     align-self: flex-start;
+     margin-left: auto;
+     padding: 1em 1.2em;
+     background-color: lightgoldenrodyellow;
+     color: rgb(92, 70, 14);
+     position: relative;
+     left: 15em;
+     border: 1px solid darkgoldenrod;
+     border-radius: 1em;
+     font-size: 1.1em;
+     text-shadow: 0 0 2px 0.5px rgb(191, 160, 84);
+ }
+
+ .dividend-button:hover {
+     align-self: start;
+     margin-left: auto;
+     padding: 1em 1.2em;
+     background-color: lightgoldenrodyellow;
+     color: rgb(152, 131, 77);
+     position: relative;
+     left: 15em;
+     border: 2px solid darkgoldenrod;
+     border-radius: 1em;
+     font-size: 1.1em;
+     text-shadow: 0 0 2px 0.5px rgb(191, 160, 84);
+     box-shadow: 0 0 2px 1px rgb(239, 239, 42);
+     cursor: pointer;
+ }
+
+ .dynamicForm {
+     position: relative;
+     left: 15em;
+     display: flex;
+     flex-direction: column;
+     justify-content: flex-start;
+     align-items: flex-start;
+ }
+
+ .formDiv {
+     width: 100%;
+     display: flex;
+     justify-content: space-between;
+ }
