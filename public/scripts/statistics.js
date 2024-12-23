@@ -1,5 +1,64 @@
 
+let stockInput2 = document.querySelector('#stock-input2');
+let add = document.querySelector('#add');
 
+add.addEventListener('click', (e) => {
+    stockInput2.style.display = 'block';
+    add.style.display = 'none';
+})
+
+
+/******************************************************************************
+ * ************************** Quartersly & Annual Toggle **********************
+ ******************************************************************************/
+
+// let tableQuarterly = document.querySelector('.table-quarterly');
+// let tableAnnual = document.querySelector('.table-annual');
+
+let companyContainers = document.querySelectorAll('.company-container');
+
+function toggle(element) {
+
+    // Select Radio Button
+    let buttons = [];
+    let quarterlyBtn = element.querySelector('.quarterly');
+    let annualBtn = element.querySelector('.annual');
+    buttons.push(quarterlyBtn, annualBtn);
+
+    // Select containers to toggle
+    let tableQuarterly = element.querySelector('.table-quarterly');
+    let tableAnnual = element.querySelector('.table-annual');
+
+    // Add Event Listener
+    buttons.forEach((button, index, array) => {
+        button.addEventListener('click', (e) => {
+
+            if (e.target == quarterlyBtn) {
+                // Remove checked for annual and remove container from the DOM
+                annualBtn.checked = false;
+                tableAnnual.classList.add('hide-table');
+
+                quarterlyBtn.checked = true;
+                tableQuarterly.classList.remove('hide-table');
+            }
+            else {
+                annualBtn.checked = true;
+                tableAnnual.classList.remove('hide-table');
+
+                quarterlyBtn.checked = false;
+                tableQuarterly.classList.add('hide-table')
+            }
+        })
+    })
+}
+
+companyContainers.forEach(toggle);
+
+
+
+/*******************************************************************************
+ ***************************** Dividend Tracker *******************************
+ ******************************************************************************/
 let dividendBtn = document.querySelector('.dividend-button');
 
 dividendBtn.addEventListener('click', (e) => {

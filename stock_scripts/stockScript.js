@@ -117,6 +117,34 @@ async function getEarnings() {
 }
 
 
+async function calculateDividendYield({ yield, initialInvestment, reinvest }) {
+
+    let totalDividendIncome = 0;
+    let investmentsArray = []; // Array of objects
+
+    for (let year = 1; year < 11; year++) {
+        totalDividendIncome += initialInvestment * (yield / 100);
+
+        switch (year) {
+            case 3:
+                investmentsArray.push(initialInvestment + totalDividendIncome);
+                break;
+            case 5:
+                investmentsArray.push(initialInvestment + totalDividendIncome);
+                break;
+            case 10:
+                investmentsArray.push(initialInvestment + totalDividendIncome)
+                break;
+            default:
+                continue;
+        }
+    }
+    console.log(investmentsArray);
+    return investmentsArray;
+
+}
+
 exports.getStockPrice = getStockPrice;
 exports.getEarnings = getEarnings;
 exports.getCurrentDate = getCurrentDate;
+exports.calculateDividendYield = calculateDividendYield;

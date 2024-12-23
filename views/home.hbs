@@ -1,4 +1,5 @@
 <main>
+    {{#if earnings}}
     <h1>Today's Earnings</h1>
     <div class="table-container">
         <table>
@@ -10,14 +11,22 @@
             <tbody>
                 {{#each earnings}}
                 <tr>
-                    <td>{{companyName}} ({{symbol}})</td>
+                    <td>{{name}} ({{symbol}})</td>
+                    {{#if epsEstimate}}
                     <td>{{epsEstimate}}</td>
+                    {{else}}
+                    <td>N/A</td>
+                    {{/if}}
+                    {{#if revenueEstimate}}
                     <td>{{revenueEstimate}}</td>
+                    {{else}}
+                    <td>N/A</td>
+                    {{/if}}
                 </tr>
                 {{/each}}
             </tbody>
-
         </table>
+        {{/if}}
     </div>
 
 

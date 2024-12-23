@@ -1,5 +1,3 @@
-// Entry point to server
-
 const express = require('express');
 const exphbs = require('express-handlebars');
 const path = require('path');
@@ -8,16 +6,13 @@ const db = require('./db/database.js');
 const session = require('express-session');
 const { hash } = require('crypto');
 const bcrypt = require('bcrypt');
-const stockScripts = require('./stock_scripts/stocks.js');
+const stockScript = require('./stock_scripts/stockScript.js');
 const { watch, stat } = require('fs');
 const axios = require('axios');
+const finnhubScript = require('./stock_scripts/finnhubApiScript.js');
 
 const app = express();
 const PORT = 5000;
-const microserviceAUrl = 'http://127.0.0.1:4200';
-const NEWSURL = "http://127.0.0.1:4350/news";
-const DIVIDENDURL = "http://127.0.0.1:4600/dividend";
-
 
 // Set View Engine
 app.engine('hbs', exphbs.engine({ extname: '.hbs' }))
@@ -37,10 +32,9 @@ app.use(session({
 
 // Functions
 
-const saltRounds = 10;
-
 async function hashPassword(password) {
     try {
+        const saltRounds = 10;
         let hash = await bcrypt.hash(password, saltRounds);
         return hash;
     }
@@ -54,316 +48,415 @@ async function hashPassword(password) {
 
 app.get('/', async (req, res) => {
 
-    // Get initials for nav bar login 
-    let initials = null;
-    let earnings = await stockScripts.getEarnings();
-    console.log(earnings)
-    if (req.session.email) {
-        initials = req.session.initials;
-    }
+    try {
+        let [date] = stockScript.getCurrentDate();
+        let earnings = await finnhubScript.getEarnings(date); // Array of earning objects
 
-    res.render('home', {
-        title: 'Home',
-        stylesheet: '/styles/home.css',
-        isLoggedIn: req.session.isLoggedIn,
-        initials: initials,
-        earnings: earnings
-    });
+        // Get company name for each stock reporting earnings
+        for (let e = 0; e < earnings.length; e++) {
+            let data = await finnhubScript.getCompanyProfile(earnings[e].symbol);
+            earnings[e].name = data.name;
+        }
+
+        res.render('home', {
+            title: 'Home',
+            stylesheet: '/styles/home.css',
+            isLoggedIn: req.session.isLoggedIn,
+            initials: req.session.initials,
+            earnings: earnings
+        });
+    }
+    catch (err) {
+        res.status(500).render('error', {
+            message: "Oops! Something went wrong on the server.",
+            stylesheet: 'styles/home.css'
+        })
+    }
 })
 
 app.get('/login', (req, res) => {
-    res.render('login', { invalidLogin: req.session.invalidLogin, isLoggedIn: req.session.isLoggedIn, stylesheet: "./styles/login.css" })
+    try {
+        res.render('login', { invalidLogin: req.session.invalidLogin, isLoggedIn: req.session.isLoggedIn, stylesheet: "./styles/login.css" })
+    }
+    catch (err) {
+        res.status(500).render('error', {
+            message: "Oops! Something went wrong on the server.",
+            stylesheet: 'styles/home.css'
+        })
+    }
 })
 
 app.post('/login', async (req, res) => {
 
+    try {
+        let compare = await db.compareCreds(req.body.email, req.body.password);
+
+        if (compare) {
+            // Set session variables for login 
+            req.session.isLoggedIn = true;
+            req.session.invalidLogin = false;
+            req.session.email = req.body.email;
+            req.session.initials = await db.getInitials(req.body.email);
+            res.redirect('/')
+        }
+
+        else {
+            req.session.invalidLogin = true;
+            res.redirect('/login')
+        }
+    }
     // Compare hashed password 
-
-    let compare = await db.compareCreds(req.body.email, req.body.password);
-
-    if (compare) {
-        // Set session variables for login 
-        req.session.isLoggedIn = true;
-        req.session.invalidLogin = false;
-        req.session.email = req.body.email;
-        req.session.initials = await db.getInitials(req.body.email);
-        res.redirect('/')
+    catch (err) {
+        res.status(500).render('error', {
+            message: "Oops! Something went wrong on the server.",
+            stylesheet: 'styles/home.css'
+        })
     }
-
-    else {
-        req.session.invalidLogin = true;
-        res.redirect('/login')
-    }
-
-
 })
 
 app.get('/register', (req, res) => {
-    res.render('register', { title: 'Register', isLoggedIn: req.session.isLoggedIn, stylesheet: './styles/login.css' })
+    try {
+        res.render('register', { title: 'Register', isLoggedIn: req.session.isLoggedIn, stylesheet: './styles/login.css' })
+    }
+    catch (err) {
+        res.status(500).render('error', {
+            message: "Oops! Something went wrong on the server.",
+            stylesheet: 'styles/home.css'
+        })
+    }
 })
 
 app.post('/register', async (req, res) => {
-    // Query Database to insert new user 
-    // fname, lname, email, hashed_password
-    let hashedPassword = await hashPassword(req.body.password);
+    try {
+        // Query Database to insert new user 
+        // fname, lname, email, hashed_password
+        let hashedPassword = await hashPassword(req.body.password);
 
-    let userID = await db.addUser({ fname: req.body.fname, lname: req.body.lname, email: req.body.email, hashedPassword: hashedPassword })
+        let userID = await db.addUser({ fname: req.body.fname, lname: req.body.lname, email: req.body.email, hashedPassword: hashedPassword })
 
-    // Set up session 
-    req.session.isLoggedIn = true;
-    req.session.email = req.body.email;
-    req.session.initials = await db.getInitials(req.body.email);
+        // Set up session 
+        req.session.isLoggedIn = true;
+        req.session.email = req.body.email;
+        req.session.initials = await db.getInitials(req.body.email);
 
-    res.redirect('/');
-
-
+        res.redirect('/');
+    }
+    catch (err) {
+        res.status(500).render('error', {
+            message: "Oops! Something went wrong on the server.",
+            stylesheet: 'styles/home.css'
+        })
+    }
 })
 
 app.get('/sign-out', (req, res) => {
-    // Destroy the session 
-    req.session.destroy((err) => {
-        if (err) {
-            console.error("Error destroyign session:", err);
-            return res.redirect('/');
-        }
-        res.redirect('/')
-    })
+    try {
+        // Destroy the session 
+        req.session.destroy((err) => {
+            if (err) {
+                console.error("Error destroyign session:", err);
+                return res.redirect('/');
+            }
+            res.redirect('/')
+        })
+    }
+    catch (err) {
+        res.status(500).render('error', {
+            message: "Oops! Something went wrong on the server.",
+            stylesheet: 'styles/home.css'
+        })
+    }
 })
 
 app.get('/portfolio', async (req, res) => {
+    try {
+        let id = null;
+        let portfolio = null;
+        let watchlist = null;
+        let initials = null;
+        // For stock in portfolio 
+        if (req.session.email) {
+            // Get userId
+            id = await db.getUserId(req.session.email);
+            console.log(`ID: ${id}`)
+            // Get user portfolio
+            portfolio = await db.getUserPortfolio(id);
 
-    let id = null;
-    let portfolio = null;
-    let watchlist = null;
-    let initials = null;
-    // For stock in portfolio 
-    if (req.session.email) {
-        // Get userId
-        id = await db.getUserId(req.session.email);
-        console.log(`ID: ${id}`)
-        // Get user portfolio
-        portfolio = await db.getUserPortfolio(id);
+            // Get price for each ticker in portfolio
+            await (async () => {
+                for (let stock of portfolio) {
+                    let currentPrice = await stockScript.getStockPrice(stock.ticker);
+                    stock.currentPrice = currentPrice;
+                }
+            })();
+            watchlist = await db.getUserWatchlist(id);
+            console.log("Watchlist: ", watchlist)
 
-        // Get price for each ticker in portfolio
-        await (async () => {
-            for (let stock of portfolio) {
-                let currentPrice = await stockScripts.getStockPrice(stock.ticker);
+            // Get price for each ticker in watchlist
+            for (let stock of watchlist) {
+                let currentPrice = await stockScript.getStockPrice(stock.ticker);
+                console.log(`Current price: ${currentPrice}`)
                 stock.currentPrice = currentPrice;
+                console.log("Stock: ", stock)
             }
-        })();
-
-
-        watchlist = await db.getUserWatchlist(id);
-        console.log("Watchlist: ", watchlist)
-
-        // Get price for each ticker in watchlist
-        for (let stock of watchlist) {
-            let currentPrice = await stockScripts.getStockPrice(stock.ticker);
-            console.log(`Current price: ${currentPrice}`)
-            stock.currentPrice = currentPrice;
-            console.log("Stock: ", stock)
+            initials = await db.getInitials(req.session.email);
         }
 
-        initials = await db.getInitials(req.session.email);
-
-
+        // Render price 
+        res.render('portfolio', {
+            portfolio: portfolio, watchlist: watchlist, isLoggedIn: req.session.isLoggedIn, stylesheet: './styles/portfolio.css',
+            initials: initials
+        })
     }
-
-    // Render price 
-    res.render('portfolio', {
-        portfolio: portfolio, watchlist: watchlist, isLoggedIn: req.session.isLoggedIn, stylesheet: './styles/portfolio.css',
-        initials: initials
-    })
+    catch (err) {
+        res.status(500).render('error', {
+            message: "Oops! Something went wrong on the server.",
+            stylesheet: 'styles/home.css'
+        })
+    }
 })
 
 app.post('/addStockToPortfolio', async (req, res) => {
-    // Get User ID from database 
-    let userId = await db.getUserId(req.session.email);
+    try {
+        // Get User ID from database 
+        let userId = await db.getUserId(req.session.email);
 
-    // Check if stock already in user's portfolio 
+        // Check if stock already in user's portfolio 
 
-    // Insert stock into portfolio 
-    let stock = {
-        userId: userId,
-        ticker: req.body.ticker,
-        qty: parseInt(req.body.qty)
-    };
+        // Insert stock into portfolio 
+        let stock = {
+            userId: userId,
+            ticker: req.body.ticker,
+            qty: parseInt(req.body.qty)
+        };
 
-    let portfolioId = await db.addStockToPortfolio(stock);
+        let portfolioId = await db.addStockToPortfolio(stock);
 
-    // Redirect to portfolio 
-    res.redirect('/portfolio')
+        // Redirect to portfolio 
+        res.redirect('/portfolio')
+    }
+    catch (err) {
+        console.log('Error adding stock to portfolio: ', err);
+        return false;
+    }
 
 })
 
 app.post('/addStockToWatchlist', async (req, res) => {
-    let userId = await db.getUserId(req.session.email);
+    try {
+        let userId = await db.getUserId(req.session.email);
 
-    let stock = {
-        userId: userId,
-        ticker: req.body.ticker
+        let stock = {
+            userId: userId,
+            ticker: req.body.ticker
+        }
+
+        let watchListId = await db.addStockToWatchList(stock);
+
+        res.redirect('/portfolio');
     }
-
-    let watchListId = await db.addStockToWatchList(stock);
-
-    res.redirect('/portfolio');
+    catch (err) {
+        console.log('Error adding stock to watchlist: ', err);
+        return false;
+    }
 })
 
 app.delete('/deleteStockFromPortfolio', async (req, res) => {
-    // Call Delete Method 
-    let id = await db.getUserId(req.session.email);
-    let params = { id: id, ticker: req.body.ticker };
-    let result = await db.deleteStockFromPortfolio(params);
-    if (result.affectedRows == 1) {
-        res.json({ success: true, message: "Stock deleted from portfolio" })
+    try {
+        // Call Delete Method 
+        let id = await db.getUserId(req.session.email);
+        let params = { id: id, ticker: req.body.ticker };
+        let result = await db.deleteStockFromPortfolio(params);
+        if (result.affectedRows == 1) {
+            res.json({ success: true, message: "Stock deleted from portfolio" })
+        }
+        else {
+            res.send("Error deleting stock")
+        }
     }
-    else {
-        res.send("Error deleting stock")
+    catch (err) {
+        console.log('Error deleting stock from portfolio: ', err);
+        return false;
     }
+
 })
 
 app.delete('/deleteStockFromWatchlist', async (req, res) => {
-    // Call Delete Method 
-    let id = await db.getUserId(req.session.email);
-    console.log(id)
-    let params = { id: id, ticker: req.body.ticker };
-    console.log(params)
-    let result = await db.deleteStockFromWatchlist(params);
-    if (result.affectedRows == 1) {
-        res.json({ success: true, message: "Stock deleted from watchlist" })
+    try {
+        // Call Delete Method 
+        let id = await db.getUserId(req.session.email);
+        console.log(id)
+        let params = { id: id, ticker: req.body.ticker };
+        console.log(params)
+        let result = await db.deleteStockFromWatchlist(params);
+        if (result.affectedRows == 1) {
+            res.json({ success: true, message: "Stock deleted from watchlist" })
+        }
+        else {
+            res.send("Error deleting stock")
+        }
     }
-    else {
-        res.send("Error deleting stock")
+    catch (err) {
+        console.log('Error deleting stock from watchlist: ', err);
+        return false;
     }
 })
 
 
 app.get('/statistics', (req, res) => {
-
-    res.render('statistics', {
-        stylesheet: './styles/statistics.css',
-        isLoggedIn: req.session.isLoggedIn,
-        initials: req.session.initials,
-        statistics: null
-    })
+    try {
+        res.render('statistics', {
+            stylesheet: './styles/statistics.css',
+            isLoggedIn: req.session.isLoggedIn,
+            initials: req.session.initials,
+            statistics: []
+        })
+    }
+    catch (err) {
+        res.status(500).render('error', {
+            message: "Oops! Something went wrong on the server.",
+            stylesheet: 'styles/home.css'
+        })
+    }
 })
 
 app.post('/statistics', async (req, res) => {
 
-    let ticker = req.body.ticker;
-    console.log(ticker)
-    let { data } = await axios(microserviceAUrl, {
-        'method': 'get',
-        'params': { 'symbol': ticker }
-    })
-    if (res.status == 204) {
-        console.log("Error retreiving statistics")
-        res.send("Error retreiving statistics")
-    }
-    else {
-        console.log(data)
+    try {
+        let symbol1 = req.body.symbol1;
+        let statistics = [];
+        let symbol1Stats = await finnhubScript.getBasicFinancials(symbol1);
+        symbol1Stats.symbol = symbol1;
+        statistics.push(symbol1Stats);
+
+        let symbol2Stats;
+        let symbol2;
+        if (req.body.symbol2) {
+            symbol2 = req.body.symbol2;
+            symbol2Stats = await finnhubScript.getBasicFinancials(symbol2);
+            symbol2Stats.symbol = symbol2;
+            statistics.push(symbol2Stats);
+        }
+
         res.render('statistics',
             {
                 stylesheet: './styles/statistics.css',
-                ticker: ticker,
                 isLoggedIn: req.session.isLoggedIn,
                 initials: req.session.initials,
-                "statistics": {
-                    peRatio: data.peRatio,
-                    eps: data.eps,
-                    operatingMargin: data.operatingMargin,
-                    salesPerShare: data.salesPerShare,
-                    fiftyTwoWeekHigh: data.fiftyTwoWeekHigh,
-                    fiftyTwoWeekLow: data.fiftyTwoWeekLow,
-                    dividendYield: data.dividendYield,
-                    marketCap: data.marketCap,
-                    quarterlyRevenueGrowth: data.quarterlyRevenueGrowth
-                }
+                statistics: statistics
             })
+    }
+    catch (err) {
+        res.status(500).render('error', {
+            message: "Oops! Something went wrong on the server.",
+            stylesheet: 'styles/home.css'
+        })
     }
 })
 
 function getPreviousDate([date, weekday, year, month, day]) {
-    let intMonth = parseInt(month)
-    let intYear = parseInt(year)
-    let previousMonth = null;
-    let previousYear = String(intYear - 1);
+    try {
+        let intMonth = parseInt(month)
+        let intYear = parseInt(year)
+        let previousMonth = null;
+        let previousYear = String(intYear - 1);
 
-    if (intMonth == 1) {
-        previousMonth = 12;
-        previousYear = parseInt(year) - 1;
-        newDate = String(previousYear) + '-' + String(previousMonth) + '-' + '01';
-        return newDate;
+        if (intMonth == 1) {
+            previousMonth = 12;
+            previousYear = parseInt(year) - 1;
+            newDate = String(previousYear) + '-' + String(previousMonth) + '-' + '01';
+            return newDate;
+        }
+        else {
+            previousMonth = intMonth - 1;
+            newDate = year + '-' + String(previousMonth) + '-' + '01';
+            return newDate;
+        }
     }
-    else {
-        previousMonth = intMonth - 1;
-        newDate = year + '-' + String(previousMonth) + '-' + '01';
-        return newDate;
+    catch (err) {
+        console.log(err);
+        return false;
     }
+
 }
 
 app.get('/news', (req, res) => {
+    try {
+        let displayData = null;
 
-    let displayData = null;
-
-    res.render('news', {
-        stylesheet: './styles/news.css',
-        isLoggedIn: req.session.isLoggedIn,
-        initials: req.session.initials,
-        displayData: displayData
-    })
+        res.render('news', {
+            stylesheet: './styles/news.css',
+            isLoggedIn: req.session.isLoggedIn,
+            initials: req.session.initials,
+            displayData: displayData
+        })
+    }
+    catch (err) {
+        res.status(500).render('error', {
+            message: "Oops! Something went wrong on the server.",
+            stylesheet: 'styles/home.css'
+        })
+    }
 })
 
 app.post('/news', async (req, res) => {
-    let symbol = req.body.symbol;
+    try {
+        let symbol = req.body.symbol;
 
-    let [date, weekday, year, month, day] = await stockScripts.getCurrentDate();
+        let [date, weekday, year, month, day] = await stockScript.getCurrentDate();
 
-    let to = year + '-' + month + '-' + day;
-    let from = getPreviousDate([date, weekday, year, month, day])
-    console.log(symbol, from, to)
+        let to = year + '-' + month + '-' + day;
+        let from = getPreviousDate([date, weekday, year, month, day])
+        console.log(symbol, from, to)
 
 
-    let newsResponse = await axios.get(NEWSURL, {
-        params: {
+        let newsResponse = await finnhubScript.getCompanyNews({
             symbol: symbol,
             from: from,
             to: to
+        })
+
+        // Format response data as a list of first 10 properties
+        let displayData = [];
+        for (let i = 0; i < newsResponse.length; i++) {
+            newsObj = newsResponse[i][1];
+            displayData.push(newsObj)
         }
-    })
+        console.log(displayData)
 
-    // Format response data as a list of first 10 properties
-    let data = newsResponse.data;
-    let displayData = [];
-    for (let i = 0; i < data.length; i++) {
-        newsObj = data[i][1];
-        displayData.push(newsObj)
+
+
+        res.render('news', {
+            stylesheet: './styles/news.css',
+            ticker: symbol,
+            isLoggedIn: req.session.isLoggedIn,
+            initials: req.session.initials,
+            displayData: displayData
+        })
     }
-    console.log(displayData)
-
-
-
-    res.render('news', {
-        stylesheet: './styles/news.css',
-        ticker: symbol,
-        isLoggedIn: req.session.isLoggedIn,
-        initials: req.session.initials,
-        displayData: displayData
-    })
+    catch (err) {
+        res.status(500).render('error', {
+            message: "Oops! Something went wrong on the server.",
+            stylesheet: 'styles/home.css'
+        })
+    }
 
 })
 
 app.post('/dividend', async (req, res) => {
-    let { symbol, yield, investmentAmount } = req.body;
-
-    yield = parseFloat(yield);
-    investmentAmount = parseFloat(investmentAmount);
-
     try {
-        let dividendRes = await axios.post(DIVIDENDURL, {
-            yield: yield,
-            initialInvestment: investmentAmount
-        })
+        let { symbol, yield, investmentAmount } = req.body;
+
+        yield = parseFloat(yield);
+        investmentAmount = parseFloat(investmentAmount);
+
+        let dividendRes = await stockScript.calculateDividendYield(
+            {
+                yield: yield,
+                initialInvestment: investmentAmount,
+                reinvest: false
+            })
+
         console.log(dividendRes.data);
         return res.json(dividendRes.data);
     }
@@ -374,6 +467,6 @@ app.post('/dividend', async (req, res) => {
 
 
 
-app.listen(PORT, () => {
+app.listen(PORT, '0.0.0.0', () => {
     console.log(`Server is running on port: ${PORT}`);
 })
