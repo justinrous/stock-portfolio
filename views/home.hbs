@@ -6,19 +6,31 @@
             <thead>
                 <th>Company</th>
                 <th>EPS Estimate</th>
+                <th>EPS Actual</th>
                 <th>Revenue Estimate</th>
+                <th>Revenue Actual</th>
             </thead>
             <tbody>
                 {{#each earnings}}
                 <tr>
                     <td>{{name}} ({{symbol}})</td>
                     {{#if epsEstimate}}
-                    <td>{{epsEstimate}}</td>
+                    <td>${{epsEstimate}}</td>
+                    {{else}}
+                    <td>N/A</td>
+                    {{/if}}
+                    {{#if epsActual}}
+                    <td>{{epsActual}}</td>
                     {{else}}
                     <td>N/A</td>
                     {{/if}}
                     {{#if revenueEstimate}}
-                    <td>{{revenueEstimate}}</td>
+                    <td>${{revenueEstimate}}</td>
+                    {{else}}
+                    <td>N/A</td>
+                    {{/if}}
+                    {{#if revenueActual}}
+                    <td>${{revenueActual}}</td>
                     {{else}}
                     <td>N/A</td>
                     {{/if}}

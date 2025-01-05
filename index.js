@@ -27,7 +27,7 @@ app.use(session({
     secret: "cs361-project-rousj",
     resave: false,
     saveUninitialized: false,
-    cookie: { secure: false }
+    cookie: { secure: false, httpOnly: true, sameSite: false }
 }))
 
 // Functions
@@ -51,9 +51,17 @@ app.get('/', async (req, res) => {
     try {
         let [date] = stockScript.getCurrentDate();
         let earnings = await finnhubScript.getEarnings(date); // Array of earning objects
+        console.log(typeof earnings[0].revenueEstimate)
 
         // Get company name for each stock reporting earnings
         for (let e = 0; e < earnings.length; e++) {
+            console.log(earnings[e].revenueEstimate)
+            formattedEstimate = finnhubScript.formatNumber(earnings[e].revenueEstimate);
+            console.log("After formatting: ", formattedEstimate)
+            earnings[e].revenueEstimate = formattedEstimate;
+            formattedActual = finnhubScript.formatNumber(earnings[e].revenueActual);
+            earnings[e].revenueActual = formattedActual;
+
             let data = await finnhubScript.getCompanyProfile(earnings[e].symbol);
             earnings[e].name = data.name;
         }

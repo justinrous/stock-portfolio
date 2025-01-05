@@ -8,6 +8,36 @@ api_key.apiKey = 'ct3ti8pr01qlnp2p8bdgct3ti8pr01qlnp2p8be0'
 const finnhubClient = new finnhub.DefaultApi()
 
 
+function formatNumber(num) {
+    // Function accepts a number and formats it as a string with commas for readability
+
+    if (!num) {
+        return null;
+    }
+
+    let formattedString = '';
+    let str = String(num);
+    let total = str.length - 1;
+    let count = 0;
+
+    while (total >= 0) {
+
+        if (count > 2) {
+            formattedString = ',' + formattedString;
+            formattedString = str[total] + formattedString;
+            console.log(formattedString)
+            count = 1;
+        }
+        else {
+            formattedString = str[total] + formattedString;
+            ++count;
+            console.log(formattedString)
+        }
+        --total;
+    }
+    return formattedString;
+}
+
 
 async function getBasicFinancials(symbol) {
     try {
@@ -149,4 +179,5 @@ exports.getBasicFinancials = getBasicFinancials;
 exports.getCompanyNews = getCompanyNews;
 exports.getEarnings = getEarnings;
 exports.getCompanyProfile = getCompanyProfile;
+exports.formatNumber = formatNumber;
 
