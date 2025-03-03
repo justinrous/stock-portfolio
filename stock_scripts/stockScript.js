@@ -6,6 +6,11 @@ let url = "https://www.alphavantage.co/query";
 let earningsUrl = "https://earnings-reports.onrender.com/";
 
 function getCurrentDate() {
+    /* Gets current date in the format YYYY-MM-DD */
+    let date = new Date().toISOString();
+    return date.slice(0, 10);
+
+    /*
     let now = new Date();
     let year = String(now.getFullYear());
     let month = String(now.getMonth() + 1).padStart(2, '0');
@@ -13,11 +18,12 @@ function getCurrentDate() {
     let weekday = now.getDay();
     let currentDate = year + "-" + month + "-" + day;
     return [currentDate, weekday, year, month, day];
+    */
 }
 
 async function getStockPrice(ticker) {
     try {
-        // Check if today's prices has already been stored to db 
+        // Check if today's prices has already been stored to db
         let [date, weekday] = getCurrentDate();
 
         // Check if it is the weekend
@@ -61,9 +67,7 @@ async function getStockPrice(ticker) {
                 arr[index] = float;
             }
         })
-        console.log(`Return value from getCurrentPrice ${stockArray[0]}`)
         let dbResult = await db.addCurrentStockPrice([ticker, date, stockArray]);
-        console.log(`DB result form adding current price: ${dbResult}`)
         if (dbResult) {
             return stockArray[0];
         }
@@ -82,7 +86,6 @@ async function getStockPrice(ticker) {
 async function getEarnings() {
     try {
         let [date, weekday] = getCurrentDate();
-        console.log(weekday)
         if (weekday == 6 || weekday == 0) {
             return null;
         }
@@ -94,7 +97,6 @@ async function getEarnings() {
         else {
             try {
                 const response = await axios.post(earningsUrl, { 'date': date })
-                console.log(`Response data from API call: ${response.data}`)
                 if (response.data) {
                     // Send earnings to database
                     let dbEntry = db.addEarnings(response.data);
@@ -139,7 +141,6 @@ async function calculateDividendYield({ yield, initialInvestment, reinvest }) {
                 continue;
         }
     }
-    console.log(investmentsArray);
     return investmentsArray;
 
 }

@@ -43,6 +43,42 @@ async function hashPassword(password) {
     }
 }
 
+function getPreviousDate(date) {
+    /*
+    ** This function is used to return a previous data from the month before.
+    ** Example: date: 2025-08-25
+    ** Return: date: 2025-07-01
+    **
+    ** Params:
+    **      date: String date in the format YYYY-MM-DD
+    ** Returns:
+    **      new_date: String date from month previous
+    */
+    try {
+
+        let intMonth = parseInt(date.slice(5, 7));
+        let intYear = parseInt(date.slice(0, 4))
+        let previousMonth;
+        let previousYear;
+        let newDate;
+
+        if (intMonth == 1) {
+            previousMonth = 12;
+            previousYear = parseInt(intYear) - 1;
+            newDate = String(previousYear) + '-' + String(previousMonth).padStart(2, "0") + '-' + '01';
+        }
+        else {
+            previousMonth = intMonth - 1;
+            newDate = String(intYear) + '-' + String(previousMonth).padStart(2, "0") + '-' + '01';
+        }
+        return newDate;
+    }
+    catch (err) {
+        console.log(err);
+        return false;
+    }
+}
+
 
 // Routes
 
@@ -51,13 +87,10 @@ app.get('/', async (req, res) => {
     try {
         let [date] = stockScript.getCurrentDate();
         let earnings = await finnhubScript.getEarnings(date); // Array of earning objects
-        console.log(typeof earnings[0].revenueEstimate)
 
         // Get company name for each stock reporting earnings
         for (let e = 0; e < earnings.length; e++) {
-            console.log(earnings[e].revenueEstimate)
             formattedEstimate = finnhubScript.formatNumber(earnings[e].revenueEstimate);
-            console.log("After formatting: ", formattedEstimate)
             earnings[e].revenueEstimate = formattedEstimate;
             formattedActual = finnhubScript.formatNumber(earnings[e].revenueActual);
             earnings[e].revenueActual = formattedActual;
@@ -100,7 +133,7 @@ app.post('/login', async (req, res) => {
         let compare = await db.compareCreds(req.body.email, req.body.password);
 
         if (compare) {
-            // Set session variables for login 
+            // Set session variables for login
             req.session.isLoggedIn = true;
             req.session.invalidLogin = false;
             req.session.email = req.body.email;
@@ -113,7 +146,7 @@ app.post('/login', async (req, res) => {
             res.redirect('/login')
         }
     }
-    // Compare hashed password 
+    // Compare hashed password
     catch (err) {
         res.status(500).render('error', {
             message: "Oops! Something went wrong on the server.",
@@ -136,13 +169,13 @@ app.get('/register', (req, res) => {
 
 app.post('/register', async (req, res) => {
     try {
-        // Query Database to insert new user 
+        // Query Database to insert new user
         // fname, lname, email, hashed_password
         let hashedPassword = await hashPassword(req.body.password);
 
         let userID = await db.addUser({ fname: req.body.fname, lname: req.body.lname, email: req.body.email, hashedPassword: hashedPassword })
 
-        // Set up session 
+        // Set up session
         req.session.isLoggedIn = true;
         req.session.email = req.body.email;
         req.session.initials = await db.getInitials(req.body.email);
@@ -159,7 +192,7 @@ app.post('/register', async (req, res) => {
 
 app.get('/sign-out', (req, res) => {
     try {
-        // Destroy the session 
+        // Destroy the session
         req.session.destroy((err) => {
             if (err) {
                 console.error("Error destroyign session:", err);
@@ -182,11 +215,10 @@ app.get('/portfolio', async (req, res) => {
         let portfolio = null;
         let watchlist = null;
         let initials = null;
-        // For stock in portfolio 
+        // For stock in portfolio
         if (req.session.email) {
             // Get userId
             id = await db.getUserId(req.session.email);
-            console.log(`ID: ${id}`)
             // Get user portfolio
             portfolio = await db.getUserPortfolio(id);
 
@@ -198,19 +230,16 @@ app.get('/portfolio', async (req, res) => {
                 }
             })();
             watchlist = await db.getUserWatchlist(id);
-            console.log("Watchlist: ", watchlist)
 
             // Get price for each ticker in watchlist
             for (let stock of watchlist) {
                 let currentPrice = await stockScript.getStockPrice(stock.ticker);
-                console.log(`Current price: ${currentPrice}`)
                 stock.currentPrice = currentPrice;
-                console.log("Stock: ", stock)
             }
             initials = await db.getInitials(req.session.email);
         }
 
-        // Render price 
+        // Render price
         res.render('portfolio', {
             portfolio: portfolio, watchlist: watchlist, isLoggedIn: req.session.isLoggedIn, stylesheet: './styles/portfolio.css',
             initials: initials
@@ -226,12 +255,12 @@ app.get('/portfolio', async (req, res) => {
 
 app.post('/addStockToPortfolio', async (req, res) => {
     try {
-        // Get User ID from database 
+        // Get User ID from database
         let userId = await db.getUserId(req.session.email);
 
-        // Check if stock already in user's portfolio 
+        // Check if stock already in user's portfolio
 
-        // Insert stock into portfolio 
+        // Insert stock into portfolio
         let stock = {
             userId: userId,
             ticker: req.body.ticker,
@@ -240,7 +269,7 @@ app.post('/addStockToPortfolio', async (req, res) => {
 
         let portfolioId = await db.addStockToPortfolio(stock);
 
-        // Redirect to portfolio 
+        // Redirect to portfolio
         res.redirect('/portfolio')
     }
     catch (err) {
@@ -271,7 +300,7 @@ app.post('/addStockToWatchlist', async (req, res) => {
 
 app.delete('/deleteStockFromPortfolio', async (req, res) => {
     try {
-        // Call Delete Method 
+        // Call Delete Method
         let id = await db.getUserId(req.session.email);
         let params = { id: id, ticker: req.body.ticker };
         let result = await db.deleteStockFromPortfolio(params);
@@ -291,11 +320,9 @@ app.delete('/deleteStockFromPortfolio', async (req, res) => {
 
 app.delete('/deleteStockFromWatchlist', async (req, res) => {
     try {
-        // Call Delete Method 
+        // Call Delete Method
         let id = await db.getUserId(req.session.email);
-        console.log(id)
         let params = { id: id, ticker: req.body.ticker };
-        console.log(params)
         let result = await db.deleteStockFromWatchlist(params);
         if (result.affectedRows == 1) {
             res.json({ success: true, message: "Stock deleted from watchlist" })
@@ -362,32 +389,6 @@ app.post('/statistics', async (req, res) => {
     }
 })
 
-function getPreviousDate([date, weekday, year, month, day]) {
-    try {
-        let intMonth = parseInt(month)
-        let intYear = parseInt(year)
-        let previousMonth = null;
-        let previousYear = String(intYear - 1);
-
-        if (intMonth == 1) {
-            previousMonth = 12;
-            previousYear = parseInt(year) - 1;
-            newDate = String(previousYear) + '-' + String(previousMonth) + '-' + '01';
-            return newDate;
-        }
-        else {
-            previousMonth = intMonth - 1;
-            newDate = year + '-' + String(previousMonth) + '-' + '01';
-            return newDate;
-        }
-    }
-    catch (err) {
-        console.log(err);
-        return false;
-    }
-
-}
-
 app.get('/news', (req, res) => {
     try {
         let displayData = null;
@@ -411,11 +412,9 @@ app.post('/news', async (req, res) => {
     try {
         let symbol = req.body.symbol;
 
-        let [date, weekday, year, month, day] = await stockScript.getCurrentDate();
+        let to = stockScript.getCurrentDate(); // Today's date
 
-        let to = year + '-' + month + '-' + day;
-        let from = getPreviousDate([date, weekday, year, month, day])
-        console.log(symbol, from, to)
+        let from = getPreviousDate(to);
 
 
         let newsResponse = await finnhubScript.getCompanyNews({
@@ -426,13 +425,11 @@ app.post('/news', async (req, res) => {
 
         // Format response data as a list of first 10 properties
         let displayData = [];
+        let newsObj;
         for (let i = 0; i < newsResponse.length; i++) {
             newsObj = newsResponse[i][1];
             displayData.push(newsObj)
         }
-        console.log(displayData)
-
-
 
         res.render('news', {
             stylesheet: './styles/news.css',
@@ -465,7 +462,6 @@ app.post('/dividend', async (req, res) => {
                 reinvest: false
             })
 
-        console.log(dividendRes.data);
         return res.json(dividendRes.data);
     }
     catch (err) {
