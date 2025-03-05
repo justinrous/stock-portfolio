@@ -44,7 +44,7 @@ async function getStockPrice(ticker) {
             function: "TIME_SERIES_DAILY",
             symbol: ticker,
             outputsize: "compact",
-            apikey: "2FWMV39FE2R2V0S4",
+            apikey: process.env.ALPHA_VANTAGE_API_KEY,
         }
         let response = await axios.get(url, { params: params })
         let result = response['data']['Time Series (Daily)'];

@@ -1,11 +1,12 @@
 const finnhub = require('finnhub');
 const axios = require('axios')
+require('dotenv').config();
 
 
 // Finnhub Client setup
 const api_key = finnhub.ApiClient.instance.authentications['api_key'];
-api_key.apiKey = 'ct3ti8pr01qlnp2p8bdgct3ti8pr01qlnp2p8be0'
-const finnhubClient = new finnhub.DefaultApi()
+api_key.apiKey = process.env.FINNHUB_API_KEY;
+const finnhubClient = new finnhub.DefaultApi();
 
 
 function formatNumber(num) {

@@ -2,3 +2,4 @@ node_modules/
 notes.txt
 api_key.txt
 .vscode/
+.env
