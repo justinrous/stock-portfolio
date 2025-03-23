@@ -86,17 +86,39 @@ app.get('/', async (req, res) => {
 
     try {
         let [date] = stockScript.getCurrentDate();
-        let earnings = await finnhubScript.getEarnings(date); // Array of earning objects
+        let earnings = await finnhubScript.getEarnings('2025-03-24'); // Array of earning objects
+        // console.log(earnings.length);
 
         // Get company name for each stock reporting earnings
         for (let e = 0; e < earnings.length; e++) {
-            formattedEstimate = finnhubScript.formatNumber(earnings[e].revenueEstimate);
-            earnings[e].revenueEstimate = formattedEstimate;
-            formattedActual = finnhubScript.formatNumber(earnings[e].revenueActual);
-            earnings[e].revenueActual = formattedActual;
+            if (earnings[e].epsEstimate != null) {
+                earnings[e].epsEstimate = finnhubScript.formatNumber(earnings[e].epsEstimate);
+            }
+            if (earnings[e].epsActual != null) {
+                earnings[e].epsActual = finnhubScript.formatNumber(earnings[e].epsActual);
+            }
+            if (earnings[e].revenueEstimate != null) {
+                earnings[e].revenueEstimate = finnhubScript.formatNumber(earnings[e].revenueEstimate);
+            }
+            if (earnings[e].revenueActual != null) {
+                earnings[e].revenueActual = finnhubScript.formatNumber(earnings[e].revenueActual);
+            }
+            // earnings[e].revenueEstimate = finnhubScript.formatNumber(earnings[e].revenueEstimate);
+            // earnings[e].revenueActual = finnhubScript.formatNumber(earnings[e].revenueActual);
+            // formattedEstimate = finnhubScript.formatNumber(earnings[e].revenueEstimate);
+            // let formattedEstimate = earnings[e].revenueEstimate;
+            // console.log(typeof formattedEstimate);
+            // earnings[e].revenueEstimate = formattedEstimate.toLocaleString('en-US', { style: 'currency', currency: 'USD' });
+            // earnings[e].revenueEstimate = formattedEstimate;
+            // let formattedActual = earnings[e].revenueActual;
+            // earnings[e].revenueActual = formattedActual.toLocaleString('en-US', { style: 'currency', currency: 'USD' });
+            // formattedActual = finnhubScript.formatNumber(earnings[e].revenueActual);
+            // formattedActual = earnings[e].revenueActual.toLocaleString('en-US', { style: 'currency', currency: 'USD' });
+            // earnings[e].revenueActual = formattedActual;
 
-            let data = await finnhubScript.getCompanyProfile(earnings[e].symbol);
-            earnings[e].name = data.name;
+            // let data = await finnhubScript.getCompanyProfile(earnings[e].symbol);
+            // earnings[e].name = data.name;
+            earnings[e].name = "Company Name";
         }
 
         res.render('home', {

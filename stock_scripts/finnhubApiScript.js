@@ -1,5 +1,5 @@
 const finnhub = require('finnhub');
-const axios = require('axios')
+const axios = require('axios');
 require('dotenv').config();
 
 
@@ -11,33 +11,37 @@ const finnhubClient = new finnhub.DefaultApi();
 
 function formatNumber(num) {
     // Function accepts a number and formats it as a string with commas for readability
-
-    if (!num) {
-        return null;
-    }
-
-    let formattedString = '';
-    let str = String(num);
-    let total = str.length - 1;
-    let count = 0;
-
-    while (total >= 0) {
-
-        if (count > 2) {
-            formattedString = ',' + formattedString;
-            formattedString = str[total] + formattedString;
-            console.log(formattedString)
-            count = 1;
-        }
-        else {
-            formattedString = str[total] + formattedString;
-            ++count;
-            console.log(formattedString)
-        }
-        --total;
-    }
-    return formattedString;
+    return num.toLocaleString('en-US', { style: 'currency', currency: 'USD' });
 }
+/*
+
+if (!num) {
+    return null;
+}
+
+let formattedString = '';
+let str = String(num);
+let total = str.length - 1;
+let count = 0;
+
+while (total >= 0) {
+
+    if (count > 2) {
+        formattedString = ',' + formattedString;
+        formattedString = str[total] + formattedString;
+        console.log(formattedString)
+        count = 1;
+    }
+    else {
+        formattedString = str[total] + formattedString;
+        ++count;
+        console.log(formattedString)
+    }
+    --total;
+}
+return formattedString;
+*/
+
 
 
 async function getBasicFinancials(symbol) {
