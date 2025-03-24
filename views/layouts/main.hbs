@@ -1,42 +1,37 @@
 <!DOCTYPE html>
 <html>
 
-<head>
-    <meta charset='utf-8'>
-    <meta http-equiv='X-UA-Compatible' content='IE=edge'>
-    <title>{{title}}</title>
-    <meta name='viewport' content='width=device-width, initial-scale=1'>
-    <link rel="stylesheet" href="./styles/nav-bar.css">
-    <link rel='stylesheet' type='text/css' media='screen' href={{stylesheet}}>
-</head>
+    <head>
+        <meta charset='utf-8'>
+        <meta http-equiv='X-UA-Compatible' content='IE=edge'>
+        <title>{{title}}</title>
+        <meta name='viewport' content='width=device-width, initial-scale=1'>
+        <link rel="stylesheet" href="./styles/nav-bar.css">
+        <link rel='stylesheet' type='text/css' media='screen' href={{stylesheet}}>
+    </head>
 
 
-<body>
-    <header>
-        <a href="/" id="logo">Smart Money</a>
-        <nav>
-            {{#if isLoggedIn}}
-            <div class="portfolio-container">
-                <a href="/portfolio" id="portfolio-btn">Portfolio</a>
-                <div id="message">Click here to manage your portfolio</div>
-            </div>
-            <div class="statistics-container">
-                <a href="/statistics">Statistics</a>
-            </div>
-            <div class="news-container">
-                <a href="/news">News</a>
-            </div>
-            <div id="initials-container">
-                <button id="initials">{{initials}}</button>
-                <a href="/sign-out" id="sign-out">Sign Out</a>
-            </div>
+    <body>
+        <header>
+            <a href="/" id="logo">Smart Money</a>
+            <nav>
+                {{#if isLoggedIn}}
+                    <div id="initials-container">
+                        <button id="initials">{{initials}}</button>
+                        <div class="nav-bar-container">
+                            <a href="/portfolio" id="portfolio-btn">Portfolio</a>
+                            <a href="/statistics">Statistics</a>
+                            <a href="/news">News</a>
+                            <a href="/sign-out" id="sign-out">Sign Out</a>
+                        </div>
+                    </div>
 
-            {{else}}
-            <div>
-                <a href="/login" id="login">Login</a>
-            </div>
-            {{/if}}
-        </nav>
-    </header>
-    {{{body}}}
-</body>
+                {{else}}
+                    <div>
+                        <a href="/login" id="login">Login</a>
+                    </div>
+                {{/if}}
+            </nav>
+        </header>
+        {{{body}}}
+    </body>

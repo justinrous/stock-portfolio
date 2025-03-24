@@ -86,7 +86,7 @@ app.get('/', async (req, res) => {
 
     try {
         let [date] = stockScript.getCurrentDate();
-        let earnings = await finnhubScript.getEarnings('2025-03-24'); // Array of earning objects
+        let earnings = await finnhubScript.getEarnings('2025-03-25'); // Array of earning objects
         // console.log(earnings.length);
 
         // Get company name for each stock reporting earnings

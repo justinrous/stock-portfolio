@@ -33,63 +33,57 @@
      color: gold;
  }
 
+ nav a:active {
+     color: rgb(38, 33, 4);
+ }
+
+ nav .nav-bar-container {
+     display: flex;
+     flex-direction: column;
+     justify-content: space-evenly;
+     align-items: center;
+     position: absolute;
+     opacity: 0;
+     transition: opacity 0.3s ease-out;
+     position: absolute;
+     top: 8vh;
+ }
+
+ nav .nav-bar-container a {
+     font-size: 1.1em;
+     padding: 0.2em 0;
+ }
+
  nav button {
-     width: 3em;
+     width: 4em;
      background-color: rgb(215, 207, 164);
      color: black;
-     font-size: 1em;
+     font-size: 1.5em;
+     font-weight: bold;
      letter-spacing: 0.1em;
      border: 1px solid whitesmoke;
      border-radius: 1em;
      box-shadow: 0 0;
-     transition: box-shadow 0.1s ease-out;
+     transition: box-shadow 0.1s ease-out, color 0.1s ease-out;
+     padding: 0.4em 0;
  }
 
  nav button:hover {
      box-shadow: 0px 0px 4px 2px gold;
- }
-
- nav .portfolio-container {
-     display: flex;
-     flex-direction: column;
-     position: relative;
- }
-
- .portfolio-container div {
-     color: rgb(134, 102, 23);
-     background-color: white;
-     border: 1px solid goldenrod;
-     padding: 2em 2em;
-     position: absolute;
-     width: 10em;
-     top: 3em;
-     opacity: 0;
-     transition: opacity 0.3s ease-out;
- }
-
- nav #portfolio-btn {
-     align-self: center;
- }
-
- .portfolio-container #portfolio-btn:hover + div {
-     opacity: 1;
+     color: rgb(20, 21, 1)
  }
 
  #initials-container {
      display: flex;
      flex-direction: column;
+     align-items: center;
  }
 
  #initials {
      color: black;
  }
 
- #sign-out {
-     opacity: 0;
-     transition: opacity 0.3s ease-out;
-     margin: 0.2em 0;
- }
-
- nav #initials-container:hover #sign-out {
-     opacity: 100;
+ #initials-container:hover .nav-bar-container {
+     cursor: pointer;
+     opacity: 1;
  }
