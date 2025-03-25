@@ -52,6 +52,15 @@
  nav .nav-bar-container a {
      font-size: 1.1em;
      padding: 0.2em 0;
+     transition: color 0.1s ease-out;
+ }
+
+ nav .nav-bar-container a:hover {
+     color: rgb(150, 133, 38);
+ }
+
+ nav .nav-bar-container a:active {
+     color: rgb(74, 64, 9);
  }
 
  nav button {
@@ -86,4 +95,49 @@
  #initials-container:hover .nav-bar-container {
      cursor: pointer;
      opacity: 1;
+ }
+
+ /* ------------------------------------------------------------------
+-------------- Responsive Design Queries -------------------------------------
+---------------------------------------------------------------------*/
+ @media (min-height: 100px) {
+     nav .nav-bar-container {
+         top: 16vh;
+     }
+ }
+
+ @media (min-height: 200px) {
+     nav .nav-bar-container {
+         top: 13vh;
+     }
+ }
+
+ @media (min-height: 300px) {
+     nav .nav-bar-container {
+         top: 11vh;
+     }
+ }
+
+ @media (min-height: 420px) {
+     nav .nav-bar-container {
+         top: 10vh;
+     }
+ }
+
+ @media (min-height: 600px) {
+     nav .nav-bar-container {
+         top: 9vh;
+     }
+ }
+
+ @media (min-height: 950px) {
+     nav .nav-bar-container {
+         top: 8vh;
+     }
+ }
+
+ @media (min-height: 1500px) {
+     nav .nav-bar-container {
+         top: 7vh;
+     }
  }
