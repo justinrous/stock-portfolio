@@ -79,8 +79,9 @@ function getPreviousDate(date) {
     }
 }
 
-
-// Routes
+/************************************************************************************
+ ************************      Routes    *******************************************
+ **********************************************************************************/
 
 app.get('/', async (req, res) => {
 
@@ -103,21 +104,6 @@ app.get('/', async (req, res) => {
             if (earnings[e].revenueActual != null) {
                 earnings[e].revenueActual = finnhubScript.formatNumber(earnings[e].revenueActual);
             }
-            // earnings[e].revenueEstimate = finnhubScript.formatNumber(earnings[e].revenueEstimate);
-            // earnings[e].revenueActual = finnhubScript.formatNumber(earnings[e].revenueActual);
-            // formattedEstimate = finnhubScript.formatNumber(earnings[e].revenueEstimate);
-            // let formattedEstimate = earnings[e].revenueEstimate;
-            // console.log(typeof formattedEstimate);
-            // earnings[e].revenueEstimate = formattedEstimate.toLocaleString('en-US', { style: 'currency', currency: 'USD' });
-            // earnings[e].revenueEstimate = formattedEstimate;
-            // let formattedActual = earnings[e].revenueActual;
-            // earnings[e].revenueActual = formattedActual.toLocaleString('en-US', { style: 'currency', currency: 'USD' });
-            // formattedActual = finnhubScript.formatNumber(earnings[e].revenueActual);
-            // formattedActual = earnings[e].revenueActual.toLocaleString('en-US', { style: 'currency', currency: 'USD' });
-            // earnings[e].revenueActual = formattedActual;
-
-            // let data = await finnhubScript.getCompanyProfile(earnings[e].symbol);
-            // earnings[e].name = data.name;
             earnings[e].name = "Company Name";
         }
 

@@ -11,37 +11,13 @@ const finnhubClient = new finnhub.DefaultApi();
 
 function formatNumber(num) {
     // Function accepts a number and formats it as a string with commas for readability
-    return num.toLocaleString('en-US', { style: 'currency', currency: 'USD' });
+    return num.toLocaleString('en-US', {
+        style: 'currency',
+        currency: 'USD',
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 0
+    });
 }
-/*
-
-if (!num) {
-    return null;
-}
-
-let formattedString = '';
-let str = String(num);
-let total = str.length - 1;
-let count = 0;
-
-while (total >= 0) {
-
-    if (count > 2) {
-        formattedString = ',' + formattedString;
-        formattedString = str[total] + formattedString;
-        console.log(formattedString)
-        count = 1;
-    }
-    else {
-        formattedString = str[total] + formattedString;
-        ++count;
-        console.log(formattedString)
-    }
-    --total;
-}
-return formattedString;
-*/
-
 
 
 async function getBasicFinancials(symbol) {
