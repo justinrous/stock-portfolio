@@ -1,13 +1,14 @@
 const mysql = require('mysql2');
 const bcrypt = require('bcrypt');
+require('dotenv').config();
 
 
 // Create a Connection to Database
 const connection = mysql.createConnection({
-    host: "127.0.0.1",
-    user: "root",
-    password: "R00t",
-    database: "cs361db"
+    host: process.env.DB_HOST,
+    user: process.env.DB_USER,
+    password: process.env.DB_PASSWORD,
+    database: process.env.DB_NAME,
 }).promise()
 
 connection.connect((err) => {
@@ -21,7 +22,7 @@ connection.connect((err) => {
 
 async function addUser(user) {
     /*
-        Inserts user into database. 
+        Inserts user into database.
         user: obj
             values: fname, lname, email, password
     */
