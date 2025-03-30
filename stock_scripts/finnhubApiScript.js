@@ -11,12 +11,17 @@ const finnhubClient = new finnhub.DefaultApi();
 
 function formatNumber(num) {
     // Function accepts a number and formats it as a string with commas for readability
-    return num.toLocaleString('en-US', {
-        style: 'currency',
-        currency: 'USD',
-        minimumFractionDigits: 0,
-        maximumFractionDigits: 2
-    });
+    if (num == null) {
+        return null;
+    }
+    else {
+        return num.toLocaleString('en-US', {
+            style: 'currency',
+            currency: 'USD',
+            minimumFractionDigits: 0,
+            maximumFractionDigits: 2
+        });
+    }
 }
 
 async function getStockPrice(ticker) {
@@ -107,18 +112,18 @@ async function getBasicFinancials(symbol) {
                             }
                         }
                         let stats = {
-                            "marketCap": metric?.marketCapitalization,
-                            "revenuePerShareAnnual": metric?.revenuePerShareAnnual,
-                            "revenuePerShareTTM": metric?.revenuePerShareTTM,
-                            "revenueGrowthQuarterlyYoy": metric?.revenueGrowthQuarterlyYoy,
-                            "revenueGrowthTTMYoy": metric?.revenueGrowthTTMYoy,
-                            "revenueGrowth3Y": metric?.revenueGrowth3Y,
-                            "revenueGrowth5Y": metric?.revenueGrowth5Y,
-                            "epsAnnual": metric?.epsAnnual,
-                            "epsGrowthQuarterlyYoy": metric?.epsGrowthQuarterlyYoy,
-                            "epsGrowthTTMYoy": metric?.epsGrowthTTMYoy,
-                            "epsGrowth3Y": metric?.epsGrowth3Y,
-                            "epsGrowth5Y": metric?.epsGrowth5Y
+                            "marketCap": formatNumber(metric?.marketCapitalization),
+                            "revenuePerShareAnnual": formatNumber(metric?.revenuePerShareAnnual),
+                            "revenuePerShareTTM": formatNumber(metric?.revenuePerShareTTM),
+                            "revenueGrowthQuarterlyYoy": formatNumber(metric?.revenueGrowthQuarterlyYoy),
+                            "revenueGrowthTTMYoy": formatNumber(metric?.revenueGrowthTTMYoy),
+                            "revenueGrowth3Y": formatNumber(metric?.revenueGrowth3Y),
+                            "revenueGrowth5Y": formatNumber(metric?.revenueGrowth5Y),
+                            "epsAnnual": formatNumber(metric?.epsAnnual),
+                            "epsGrowthQuarterlyYoy": formatNumber(metric?.epsGrowthQuarterlyYoy),
+                            "epsGrowthTTMYoy": formatNumber(metric?.epsGrowthTTMYoy),
+                            "epsGrowth3Y": formatNumber(metric?.epsGrowth3Y),
+                            "epsGrowth5Y": formatNumber(metric?.epsGrowth5Y)
                         }
 
                         resolve({

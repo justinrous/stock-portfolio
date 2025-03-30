@@ -6,7 +6,6 @@ const db = require('./db/database.js');
 const session = require('express-session');
 const { hash } = require('crypto');
 const bcrypt = require('bcrypt');
-const stockScript = require('./stock_scripts/stockScript.js');
 const { watch, stat } = require('fs');
 const axios = require('axios');
 const finnhubScript = require('./stock_scripts/finnhubApiScript.js');
@@ -91,10 +90,8 @@ function getPreviousDate(date) {
 app.get('/', async (req, res) => {
 
     try {
-        let date = stockScript.getCurrentDate();
+        let date = finnhubScript.getCurrentDate();
         let earnings;
-
-        console.log("Current date: ", date);
 
         // Check if Earnings exist in Redis
         // earnings = await redisDB.getEarnings();
@@ -102,7 +99,7 @@ app.get('/', async (req, res) => {
 
         if (!earnings) {
             // Get earnings from API
-            earnings = await finnhubScript.getEarnings('2025-03-28'); // Array of earning objects
+            earnings = await finnhubScript.getEarnings(date); // Array of earning objects
 
             // let companyProfile;
             // Get company name for each stock reporting earnings
@@ -473,7 +470,7 @@ app.post('/news', async (req, res) => {
     try {
         let symbol = req.body.symbol;
 
-        let to = stockScript.getCurrentDate(); // Today's date
+        let to = finnhubScript.getCurrentDate(); // Today's date
 
         let from = getPreviousDate(to);
 
@@ -509,6 +506,7 @@ app.post('/news', async (req, res) => {
 
 })
 
+/*
 app.post('/dividend', async (req, res) => {
     try {
         let { symbol, yield, investmentAmount } = req.body;
@@ -528,7 +526,7 @@ app.post('/dividend', async (req, res) => {
     catch (err) {
         console.log(err)
     }
-})
+}) */
 
 
 
