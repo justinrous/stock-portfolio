@@ -77,11 +77,11 @@ async function getBasicFinancials(symbol) {
                         let annualMetrics, quarterlyMetrics;
                         if (annual) {
                             annualMetrics = {
-                                "eps": { "period": annual?.eps?.[0]?.period, "value": annual?.eps?.[0]?.v },
-                                "ebitPerShare": { "period": annual?.ebitPerShare?.[0]?.period, "value": annual?.ebitPerShare?.[0]?.v },
-                                "ev": { "period": annual?.ev?.[0]?.period, "value": annual?.ev?.[0]?.v },
-                                "operatingMargin": { "period": annual?.operatingMargin?.[0]?.period, "value": annual?.operatingMargin?.[0]?.v },
-                                "grossMargin": { "period": annual?.grossMargin?.[0]?.period, "value": annual?.grossMargin?.[0]?.v },
+                                "eps": { "period": annual?.eps?.[0]?.period, "value": formatNumber(annual?.eps?.[0]?.v) },
+                                "ebitPerShare": { "period": annual?.ebitPerShare?.[0]?.period, "value": formatNumber(annual?.ebitPerShare?.[0]?.v) },
+                                "ev": { "period": annual?.ev?.[0]?.period, "value": formatNumber(annual?.ev?.[0]?.v) },
+                                "operatingMargin": { "period": annual?.operatingMargin?.[0]?.period, "value": formatNumber(annual?.operatingMargin?.[0]?.v) },
+                                "grossMargin": { "period": annual?.grossMargin?.[0]?.period, "value": formatNumber(annual?.grossMargin?.[0]?.v) },
                                 "bookValue": { "period": annual?.bookValue?.[0]?.period, "value": annual?.bookValue?.[0]?.v },
                                 "pb": { "period": annual?.pb?.[0]?.period, "value": annual?.pb?.[0]?.v },
                                 "pe": { "period": annual?.pe?.[0]?.period, "value": annual?.pe?.[0]?.v },
@@ -189,7 +189,6 @@ async function getCompanyProfile(symbol) {
                 reject(error);
             }
             else {
-                console.log("Within finnhub company profile data: ", data);
                 resolve(data);
             }
         })

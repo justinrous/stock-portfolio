@@ -96,6 +96,7 @@ app.get('/', async (req, res) => {
         // Check if Earnings exist in Redis
         // earnings = await redisDB.getEarnings();
         earnings = cache.get('earnings'); // Check if earnings are in cache
+        console.log("Earnings in cache: ", earnings);
 
         if (!earnings) {
             // Get earnings from API
@@ -116,15 +117,6 @@ app.get('/', async (req, res) => {
                 if (earnings[e].revenueActual != null) {
                     earnings[e].revenueActual = finnhubScript.formatNumber(earnings[e].revenueActual);
                 }
-
-                // Get company profile for each stock reporting earnings
-                /*
-                companyProfile = await finnhubScript.getCompanyProfile(earnings[e].symbol);
-
-                if (companyProfile) {
-                    earnings[e].name = companyProfile.name;
-                } */
-                earnings[e].name = "Company Name";
             }
             // Set earnings in node cache
 
@@ -154,11 +146,44 @@ app.get('/', async (req, res) => {
     }
 })
 
-/*
+
 // Post route for home page
 app.post('/', async (req, res) => {
+    try {
+        console.log("Post request received.");
+        let earnings = cache.get('earnings');
+        earnings = JSON.parse(earnings); // Parse the cached data back to an object
+        if (!earnings) {
+            res.send("No earnings data available.");
+        }
+        if (!(earnings[0].name)) {
+            let companies = []; // Stores company names for each stock reporting earnings
+            let companyProfile;
+            for (let i = 0; i < earnings.length; i++) {
+                companyProfile = await finnhubScript.getCompanyProfile(earnings[i].symbol);
+                if (companyProfile && i < 59) { // Limit API calls to 60
+                    earnings[i].name = companyProfile.name;
+                    companies.push(companyProfile.name);
+                }
+                else {
+                    earnings[i].name = null;
+                    companies.push(null);
+                }
+            }
+            // Set company names in cache
+            cache.set('earnings', JSON.stringify(earnings), 3600); // Cache for 1 hour
 
- } */
+            res.json(companies); // Send the company names as a response
+        }
+        else {
+            res.send("");
+        }
+
+    }
+    catch (err) {
+        console.log("Error; ", err);
+    }
+})
 
 app.get('/login', (req, res) => {
     try {
