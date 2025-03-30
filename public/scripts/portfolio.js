@@ -5,7 +5,7 @@ const addStockWatchlistButton = document.querySelector('.add-stock-watchlist-but
 
 addStockPortfolioButton.addEventListener('click', (e) => {
 
-    // Create Dynamic Form to Add stock to portfolio 
+    // Create Dynamic Form to Add stock to portfolio
     let parentSection = addStockPortfolioButton.parentElement;
     let form = document.createElement('form');
     form.setAttribute('action', '/addStockToPortfolio');
@@ -23,7 +23,7 @@ addStockPortfolioButton.addEventListener('click', (e) => {
     div.appendChild(label);
     div.appendChild(input);
 
-    // Add ticket input to form 
+    // Add ticket input to form
     form.appendChild(div);
 
     // Create quantity input
@@ -39,10 +39,10 @@ addStockPortfolioButton.addEventListener('click', (e) => {
     div2.appendChild(label2);
     div2.appendChild(input2);
 
-    // Add quantity input to form 
+    // Add quantity input to form
     form.appendChild(div2)
 
-    // Create Cancel Button 
+    // Create Cancel Button
     let cancelBtn = document.createElement('button');
     cancelBtn.textContent = 'Cancel';
     form.appendChild(cancelBtn);
@@ -94,7 +94,7 @@ addStockPortfolioButton.addEventListener('click', (e) => {
 
 addStockWatchlistButton.addEventListener('click', (e) => {
 
-    // Create Dynamic Form 
+    // Create Dynamic Form
     let parentSection = addStockWatchlistButton.parentElement;
     let form = document.createElement('form');
     form.setAttribute('action', '/addStockToWatchlist');
@@ -112,11 +112,11 @@ addStockWatchlistButton.addEventListener('click', (e) => {
     div.appendChild(label);
     div.appendChild(input);
 
-    // Add ticket input to form 
+    // Add ticket input to form
     form.appendChild(div);
 
 
-    // Create Cancel Button 
+    // Create Cancel Button
     let cancelBtn = document.createElement('button');
     cancelBtn.textContent = 'Cancel';
     form.appendChild(cancelBtn);

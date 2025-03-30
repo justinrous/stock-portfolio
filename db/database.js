@@ -22,13 +22,14 @@ connection.connect((err) => {
 
 async function addUser(user) {
     /*
-        Inserts user into database.
-        user: obj
-            values: fname, lname, email, password
+        Creates a new user in the database
+        params:
+            user: object containing user properties:
+                firstName, lastName, email, hashedPassword
     */
     try {
         let stmt = "INSERT INTO users (firstName, lastName, email, password) VALUES (?, ?, ?, ?)";
-        let params = [user.fname, user.lname, user.email, user.hashedPassword];
+        let params = [user.firstName, user.lastName, user.email, user.hashedPassword];
         let [results] = await connection.query(stmt, params);
         return results.insertId;
     }
@@ -38,6 +39,12 @@ async function addUser(user) {
 }
 
 async function compareCreds(email, password) {
+    /*
+        Compares the given credentials with the database
+        params:
+            email: user's email
+            password: user's password
+    */
     try {
         // Retrieve plain text password
         let query = "SELECT password FROM users WHERE email = ?";
@@ -47,7 +54,8 @@ async function compareCreds(email, password) {
         return compareResult;
     }
     catch (err) {
-
+        console.log("Error comparing credentials: ", err)
+        return false;
     }
 }
 
@@ -90,7 +98,6 @@ async function getUserWatchlist(id) {
     try {
         let query = "SELECT ticker FROM watchlist WHERE userId = ?";
         let [result] = await connection.query(query, [id]);
-        console.log("Watchlist result in db getwatchlist: ", result)
         return result;
     }
     catch (err) {

@@ -3,3 +3,4 @@ notes.txt
 api_key.txt
 .vscode/
 .env
+redisClient.js

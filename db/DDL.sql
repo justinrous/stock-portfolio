@@ -12,11 +12,23 @@ CREATE TABLE IF NOT EXISTS users (
 CREATE TABLE IF NOT EXISTS holdings (
     id int AUTO_INCREMENT NOT NULL,
     userId int NOT NULL,
-    ticker varchar(20) NOT NULL unique,
+    ticker varchar(20) NOT NULL,
     quantity DECIMAL(10,2) NOT NULL,
     UNIQUE (ticker, userId),
+    PRIMARY KEY (id),
     FOREIGN KEY (userId) REFERENCES users(id)
 );
+
+CREATE TABLE IF NOT EXISTS watchlist (
+    id int AUTO_INCREMENT NOT NULL,
+    userId int NOT NULL,
+    ticker varchar(20) NOT NULL,
+    UNIQUE (ticker, userId),
+    PRIMARY KEY (id),
+    FOREIGN KEY (userId) REFERENCES users(id)
+);
+
+
 /*
 CREATE TABLE IF NOT EXISTS watchList (
     userId int NOT NULL,

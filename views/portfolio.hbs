@@ -5,23 +5,27 @@
             <table>
                 <tbody>
                     {{#if portfolio}}
-                    <thead>
-                        <th>Stock Ticker</th>
-                        <th>Quantity of Shares</th>
-                        <th>Market Price</th>
-                    </thead>
-                    {{#each portfolio}}
-                    <tr>
-                        {{#each this}}
-                        {{#if this}}
-                        <td>{{this}}</td>
-                        {{else}}
-                        <td>N/A</td>
-                        {{/if}}
+                        <thead>
+                            <th>Stock Ticker</th>
+                            <th>Quantity of Shares</th>
+                            <th>Price</th>
+                            <th>Open Price</th>
+                            <th>Daily High</th>
+                            <th>Daily Low</th>
+                        </thead>
+                        {{#each portfolio}}
+                            <tr>
+                                {{#each this}}
+                                    {{#if this}}
+                                        <td>{{this}}</td>
+                                    {{else}}
+                                        <td>N/A</td>
+                                    {{/if}}
+                                {{/each}}
+                                <td><a class="delete-stock-from-portfolio" href="/deleteStockFromPortfolio">DELETE</a>
+                                </td>
+                            </tr>
                         {{/each}}
-                        <td><a class="delete-stock-from-portfolio" href="/deleteStockFromPortfolio">DELETE</a></td>
-                    </tr>
-                    {{/each}}
                     {{/if}}
                 </tbody>
             </table>
@@ -34,22 +38,26 @@
             <table>
                 <tbody>
                     {{#if watchlist}}
-                    <thead>
-                        <th>Stock Ticker</th>
-                        <th>Market Price</th>
-                    </thead>
-                    {{#each watchlist}}
-                    <tr>
-                        {{#each this}}
-                        {{#if this}}
-                        <td>{{this}}</td>
-                        {{else}}
-                        <td>N/A</td>
-                        {{/if}}
+                        <thead>
+                            <th>Stock Ticker</th>
+                            <th>Price</th>
+                            <th>Open Price</th>
+                            <th>Daily High</th>
+                            <th>Daily Low</th>
+                        </thead>
+                        {{#each watchlist}}
+                            <tr>
+                                {{#each this}}
+                                    {{#if this}}
+                                        <td>{{this}}</td>
+                                    {{else}}
+                                        <td>N/A</td>
+                                    {{/if}}
+                                {{/each}}
+                                <td><a class="delete-stock-from-watchlist" href="/deleteStockFromWatchlist">DELETE</a>
+                                </td>
+                            </tr>
                         {{/each}}
-                        <td><a class="delete-stock-from-watchlist" href="/deleteStockFromWatchlist">DELETE</a></td>
-                    </tr>
-                    {{/each}}
                     {{/if}}
                 </tbody>
             </table>

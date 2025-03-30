@@ -10,9 +10,14 @@ const stockScript = require('./stock_scripts/stockScript.js');
 const { watch, stat } = require('fs');
 const axios = require('axios');
 const finnhubScript = require('./stock_scripts/finnhubApiScript.js');
+// const redisDB = require('./db/redisClient.js');
+const nodeCache = require('node-cache');
 
 const app = express();
 const PORT = 5000;
+
+// Create a cache instance
+const cache = new nodeCache({ stdTTL: 3600, checkperiod: 120 });
 
 // Set View Engine
 app.engine('hbs', exphbs.engine({ extname: '.hbs' }))
@@ -86,25 +91,54 @@ function getPreviousDate(date) {
 app.get('/', async (req, res) => {
 
     try {
-        let [date] = stockScript.getCurrentDate();
-        let earnings = await finnhubScript.getEarnings('2025-03-25'); // Array of earning objects
-        // console.log(earnings.length);
+        let date = stockScript.getCurrentDate();
+        let earnings;
 
-        // Get company name for each stock reporting earnings
-        for (let e = 0; e < earnings.length; e++) {
-            if (earnings[e].epsEstimate != null) {
-                earnings[e].epsEstimate = finnhubScript.formatNumber(earnings[e].epsEstimate);
+        console.log("Current date: ", date);
+
+        // Check if Earnings exist in Redis
+        // earnings = await redisDB.getEarnings();
+        earnings = cache.get('earnings'); // Check if earnings are in cache
+
+        if (!earnings) {
+            // Get earnings from API
+            earnings = await finnhubScript.getEarnings('2025-03-28'); // Array of earning objects
+
+            // let companyProfile;
+            // Get company name for each stock reporting earnings
+            for (let e = 0; e < earnings.length; e++) {
+                if (earnings[e].epsEstimate != null) {
+                    earnings[e].epsEstimate = finnhubScript.formatNumber(earnings[e].epsEstimate);
+                }
+                if (earnings[e].epsActual != null) {
+                    earnings[e].epsActual = finnhubScript.formatNumber(earnings[e].epsActual);
+                }
+                if (earnings[e].revenueEstimate != null) {
+                    earnings[e].revenueEstimate = finnhubScript.formatNumber(earnings[e].revenueEstimate);
+                }
+                if (earnings[e].revenueActual != null) {
+                    earnings[e].revenueActual = finnhubScript.formatNumber(earnings[e].revenueActual);
+                }
+
+                // Get company profile for each stock reporting earnings
+                /*
+                companyProfile = await finnhubScript.getCompanyProfile(earnings[e].symbol);
+
+                if (companyProfile) {
+                    earnings[e].name = companyProfile.name;
+                } */
+                earnings[e].name = "Company Name";
             }
-            if (earnings[e].epsActual != null) {
-                earnings[e].epsActual = finnhubScript.formatNumber(earnings[e].epsActual);
-            }
-            if (earnings[e].revenueEstimate != null) {
-                earnings[e].revenueEstimate = finnhubScript.formatNumber(earnings[e].revenueEstimate);
-            }
-            if (earnings[e].revenueActual != null) {
-                earnings[e].revenueActual = finnhubScript.formatNumber(earnings[e].revenueActual);
-            }
-            earnings[e].name = "Company Name";
+            // Set earnings in node cache
+
+            // Serialize the earnings data to a string before storing it in the cache
+            let serializedEarnings = JSON.stringify(earnings);
+            cache.set('earnings', serializedEarnings, 3600); // Cache for 1 hour
+            console.log("Earnings not in cache, retrieved from API: ", serializedEarnings);
+        }
+        else {
+            earnings = JSON.parse(earnings); // Parse the cached data back to an object
+            console.log("Earnings already in cache: ", earnings);
         }
 
         res.render('home', {
@@ -122,6 +156,12 @@ app.get('/', async (req, res) => {
         })
     }
 })
+
+/*
+// Post route for home page
+app.post('/', async (req, res) => {
+
+ } */
 
 app.get('/login', (req, res) => {
     try {
@@ -146,12 +186,12 @@ app.post('/login', async (req, res) => {
             req.session.invalidLogin = false;
             req.session.email = req.body.email;
             req.session.initials = await db.getInitials(req.body.email);
-            res.redirect('/')
+            res.redirect('/');
         }
 
         else {
             req.session.invalidLogin = true;
-            res.redirect('/login')
+            res.redirect('/login');
         }
     }
     // Compare hashed password
@@ -181,7 +221,7 @@ app.post('/register', async (req, res) => {
         // fname, lname, email, hashed_password
         let hashedPassword = await hashPassword(req.body.password);
 
-        let userID = await db.addUser({ fname: req.body.fname, lname: req.body.lname, email: req.body.email, hashedPassword: hashedPassword })
+        let userID = await db.addUser({ firstName: req.body.fname, lastName: req.body.lname, email: req.body.email, hashedPassword: hashedPassword })
 
         // Set up session
         req.session.isLoggedIn = true;
@@ -192,7 +232,7 @@ app.post('/register', async (req, res) => {
     }
     catch (err) {
         res.status(500).render('error', {
-            message: "Oops! Something went wrong on the server.",
+            message: "Oops! Something went wrong on the server and could not register new account.",
             stylesheet: 'styles/home.css'
         })
     }
@@ -223,27 +263,40 @@ app.get('/portfolio', async (req, res) => {
         let portfolio = null;
         let watchlist = null;
         let initials = null;
+        // await stockScript.getStockPrice('AAPL'); // Test API call to check if API is working
         // For stock in portfolio
         if (req.session.email) {
             // Get userId
             id = await db.getUserId(req.session.email);
             // Get user portfolio
             portfolio = await db.getUserPortfolio(id);
+            watchlist = await db.getUserWatchlist(id);
+            console.log("Portfolio: ", portfolio);
+            console.log("Watchlist: ", watchlist);
 
-            // Get price for each ticker in portfolio
+            // Get stock price for each stock ticker in portfolio
             await (async () => {
                 for (let stock of portfolio) {
-                    let currentPrice = await stockScript.getStockPrice(stock.ticker);
-                    stock.currentPrice = currentPrice;
+                    let prices = await finnhubScript.getStockPrice(stock.ticker);
+                    console.log(prices);
+                    stock.price = finnhubScript.formatNumber(parseFloat(prices[0]));
+                    stock.openPrice = finnhubScript.formatNumber(parseFloat(prices[1]));
+                    stock.highPrice = finnhubScript.formatNumber(parseFloat(prices[2]));
+                    stock.lowPrice = finnhubScript.formatNumber(parseFloat(prices[3]));
                 }
             })();
-            watchlist = await db.getUserWatchlist(id);
 
-            // Get price for each ticker in watchlist
-            for (let stock of watchlist) {
-                let currentPrice = await stockScript.getStockPrice(stock.ticker);
-                stock.currentPrice = currentPrice;
-            }
+            // Get stock price for each stock ticker in watchlist
+            await (async () => {
+                for (let stock of watchlist) {
+                    let prices = await finnhubScript.getStockPrice(stock.ticker);
+                    stock.price = finnhubScript.formatNumber(parseFloat(prices[0]));
+                    stock.openPrice = finnhubScript.formatNumber(parseFloat(prices[1]));
+                    stock.highPrice = finnhubScript.formatNumber(parseFloat(prices[2]));
+                    stock.lowPrice = finnhubScript.formatNumber(parseFloat(prices[3]));
+                }
+            })();
+
             initials = await db.getInitials(req.session.email);
         }
 

@@ -15,8 +15,44 @@ function formatNumber(num) {
         style: 'currency',
         currency: 'USD',
         minimumFractionDigits: 0,
-        maximumFractionDigits: 0
+        maximumFractionDigits: 2
     });
+}
+
+async function getStockPrice(ticker) {
+    /*
+    *** Get stock price from Alpha Vantage API
+    ** returns:
+    **      - Array of stock prices [open, high, low, close, volume]
+    */
+
+    try {
+        return new Promise((resolve, reject) => {
+            finnhubClient.quote(ticker, (err, data, response) => {
+                if (err) {
+                    console.log("Error with API call: ", error);
+                    reject(false);
+                }
+                else {
+                    try {
+                        let stockPrice = data?.c;
+                        let openPrice = data?.o;
+                        let highPrice = data?.h;
+                        let lowPrice = data?.l;
+                        resolve([stockPrice, openPrice, highPrice, lowPrice]);
+                    }
+                    catch (err) {
+                        console.log("Error formatting data: ", err);
+                        reject(false);
+                    }
+                }
+            })
+        })
+    }
+    catch (err) {
+        console.log(err);
+        return null;
+    }
 }
 
 
@@ -34,7 +70,6 @@ async function getBasicFinancials(symbol) {
                         let quarterly = data?.series?.quarterly;
                         let metric = data?.metric;
                         let annualMetrics, quarterlyMetrics;
-                        console.log(quarterly)
                         if (annual) {
                             annualMetrics = {
                                 "eps": { "period": annual?.eps?.[0]?.period, "value": annual?.eps?.[0]?.v },
@@ -114,15 +149,13 @@ async function getCompanyNews({ symbol, from, to }) {
     return new Promise((resolve, reject) => {
         finnhubClient.companyNews(symbol, from, to, (error, data, response) => {
             if (error) {
-                console.log(error)
-                reject(error)
+                console.log(error);
+                reject(error);
             }
             else {
-                console.log("Within news functon")
                 let data2 = Object.entries(data);
                 let data3 = data2.slice(0, 10);
-                console.log(data3)
-                resolve(data3)
+                resolve(data3);
             }
         })
     })
@@ -136,6 +169,7 @@ async function getEarnings(date) {
                 reject(error);
             }
             else {
+                console.log(data.earningsCalendar)
                 resolve(data.earningsCalendar);
             }
         })
@@ -150,10 +184,17 @@ async function getCompanyProfile(symbol) {
                 reject(error);
             }
             else {
+                console.log("Within finnhub company profile data: ", data);
                 resolve(data);
             }
         })
     })
+}
+
+function getCurrentDate() {
+    /* Gets current date in the format YYYY-MM-DD */
+    let date = new Date().toISOString();
+    return date.slice(0, 10);
 }
 
 exports.getBasicFinancials = getBasicFinancials;
@@ -161,4 +202,7 @@ exports.getCompanyNews = getCompanyNews;
 exports.getEarnings = getEarnings;
 exports.getCompanyProfile = getCompanyProfile;
 exports.formatNumber = formatNumber;
+exports.getStockPrice = getStockPrice;
+exports.getCurrentDate = getCurrentDate;
+
 
