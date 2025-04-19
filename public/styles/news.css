@@ -64,6 +64,7 @@ section div {
     flex-direction: column;
     align-items: center;
     margin: 1.5em;
+    max-width: 80%;
 }
 
 div .headline {
@@ -72,12 +73,11 @@ div .headline {
 }
 
 div img {
-    width: 50em;
-    height: 30em;
+    max-width: 100%;
 }
 
 div .summary {
-    width: 50em;
+    max-width: 90%;
 }
 
 section div * {
@@ -93,3 +93,7 @@ div a:hover {
     text-decoration: none;
     color: rgb(44, 44, 8);
 }
+
+/* ------------------------------------------------------------------------
+----------------- Media Queries -------------------------------------------
+-------------------------------------------------------------------------*/

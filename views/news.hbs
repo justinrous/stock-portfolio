@@ -11,19 +11,19 @@
         </fieldset>
     </form>
     {{#if displayData}}
-    <section>
-        {{#each displayData}}
-        <div>
-            <p class="headline">{{headline}}</p>
-            {{#if image}}
-            <img src="{{image}}" alt=" Company Image">
-            {{else}}
-            <img src='./images/nyse.jpg' alt="Company Image">
-            {{/if}}
-            <p class="summary">{{summary}}</p>
-            <a href={{url}}>Link to Full Article</a>
-        </div>
-        {{/each}}
-    </section>
+        <section>
+            {{#each displayData}}
+                <div>
+                    <p class="headline">{{headline}}</p>
+                    {{#if image}}
+                        <img src="{{image}}" alt=" Company Image">
+                    {{else}}
+                        <img src='./images/nyse.jpg' alt="Company Image">
+                    {{/if}}
+                    <p class="summary">{{summary}}</p>
+                    <a href={{url}}>Link to Full Article</a>
+                </div>
+            {{/each}}
+        </section>
     {{/if}}
 </main>

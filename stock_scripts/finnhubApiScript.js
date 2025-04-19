@@ -16,8 +16,7 @@ function formatNumber(num) {
     }
     else {
         return num.toLocaleString('en-US', {
-            style: 'currency',
-            currency: 'USD',
+            style: 'decimal',
             minimumFractionDigits: 0,
             maximumFractionDigits: 2
         });
@@ -75,44 +74,45 @@ async function getBasicFinancials(symbol) {
                         let quarterly = data?.series?.quarterly;
                         let metric = data?.metric;
                         let annualMetrics, quarterlyMetrics;
+                        // console.log("Market Cap: ", metric?.marketCapitalization);
                         if (annual) {
                             annualMetrics = {
                                 "eps": { "period": annual?.eps?.[0]?.period, "value": formatNumber(annual?.eps?.[0]?.v) },
                                 "ebitPerShare": { "period": annual?.ebitPerShare?.[0]?.period, "value": formatNumber(annual?.ebitPerShare?.[0]?.v) },
-                                "ev": { "period": annual?.ev?.[0]?.period, "value": formatNumber(annual?.ev?.[0]?.v) },
+                                "ev": { "period": annual?.ev?.[0]?.period, "value": formatNumber(annual?.ev?.[0]?.v * 1000000) },
                                 "operatingMargin": { "period": annual?.operatingMargin?.[0]?.period, "value": formatNumber(annual?.operatingMargin?.[0]?.v) },
                                 "grossMargin": { "period": annual?.grossMargin?.[0]?.period, "value": formatNumber(annual?.grossMargin?.[0]?.v) },
-                                "bookValue": { "period": annual?.bookValue?.[0]?.period, "value": annual?.bookValue?.[0]?.v },
-                                "pb": { "period": annual?.pb?.[0]?.period, "value": annual?.pb?.[0]?.v },
-                                "pe": { "period": annual?.pe?.[0]?.period, "value": annual?.pe?.[0]?.v },
-                                "ps": { "period": annual?.ps?.[0]?.period, "value": annual?.ps?.[0]?.v },
-                                "cashRatio": { "period": annual?.cashRatio?.[0]?.period, "value": annual?.cashRatio?.[0]?.v },
-                                "currentRatio": { "period": annual?.currentRatio?.[0]?.period, "value": annual?.currentRatio?.[0]?.v },
-                                "quickRatio": { "period": annual?.quickRatio?.[0]?.period, "value": annual?.quickRatio?.[0]?.v },
-                                "roa": { "period": annual?.roa?.[0]?.period, "value": annual?.roa?.[0]?.v },
-                                "roe": { "period": annual?.roe?.[0]?.period, "value": annual?.roe?.[0]?.v },
+                                "bookValue": { "period": annual?.bookValue?.[0]?.period, "value": formatNumber(annual?.bookValue?.[0]?.v) },
+                                "pb": { "period": annual?.pb?.[0]?.period, "value": formatNumber(annual?.pb?.[0]?.v) },
+                                "pe": { "period": annual?.pe?.[0]?.period, "value": formatNumber(annual?.pe?.[0]?.v) },
+                                "ps": { "period": annual?.ps?.[0]?.period, "value": formatNumber(annual?.ps?.[0]?.v) },
+                                "cashRatio": { "period": annual?.cashRatio?.[0]?.period, "value": formatNumber(annual?.cashRatio?.[0]?.v) },
+                                "currentRatio": { "period": annual?.currentRatio?.[0]?.period, "value": formatNumber(annual?.currentRatio?.[0]?.v) },
+                                "quickRatio": { "period": annual?.quickRatio?.[0]?.period, "value": formatNumber(annual?.quickRatio?.[0]?.v) },
+                                "roa": { "period": annual?.roa?.[0]?.period, "value": formatNumber(annual?.roa?.[0]?.v * 100) },
+                                "roe": { "period": annual?.roe?.[0]?.period, "value": formatNumber(annual?.roe?.[0]?.v * 100) },
                             }
                         }
                         if (quarterly) {
                             quarterlyMetrics = {
-                                "eps": { "period": quarterly?.eps?.[0]?.period, "value": quarterly?.eps?.[0]?.v },
-                                "ebitPerShare": { "period": quarterly?.ebitPerShare?.[0]?.period, "value": quarterly?.ebitPerShare?.[0]?.v },
-                                "ev": { "period": quarterly?.ev?.[0]?.period, "value": quarterly?.ev?.[0]?.v },
-                                "operatingMargin": { "period": quarterly?.operatingMargin?.[0]?.period, "value": quarterly?.operatingMargin?.[0]?.v },
-                                "grossMargin": { "period": quarterly?.grossMargin?.[0]?.period, "value": quarterly?.grossMargin?.[0]?.v },
-                                "bookValue": { "period": quarterly?.bookValue?.[0]?.period, "value": quarterly?.bookValue?.[0]?.v },
-                                "pb": { "period": quarterly?.pb?.[0]?.period, "value": quarterly?.pb?.[0]?.v },
-                                "pe": { "period": quarterly?.pe?.[0]?.period, "value": quarterly?.peTTM?.[0]?.v },
-                                "ps": { "period": quarterly?.ps?.[0]?.period, "value": quarterly?.psTTM?.[0]?.v },
-                                "cashRatio": { "period": quarterly?.cashRatio?.[0]?.period, "value": quarterly?.cashRatio?.[0]?.v },
-                                "currentRatio": { "period": quarterly?.currentRatio?.[0]?.period, "value": quarterly?.currentRatio?.[0]?.v },
-                                "quickRatio": { "period": quarterly?.quickRatio?.[0]?.period, "value": quarterly?.quickRatio?.[0]?.v },
-                                "roa": { "period": quarterly?.roa?.[0]?.period, "value": quarterly?.roaTTM?.[0]?.v },
-                                "roe": { "period": quarterly?.roe?.[0]?.period, "value": quarterly?.roeTTM?.[0]?.v },
+                                "eps": { "period": quarterly?.eps?.[0]?.period, "value": formatNumber(quarterly?.eps?.[0]?.v) },
+                                "ebitPerShare": { "period": quarterly?.ebitPerShare?.[0]?.period, "value": formatNumber(quarterly?.ebitPerShare?.[0]?.v) },
+                                "ev": { "period": quarterly?.ev?.[0]?.period, "value": formatNumber(quarterly?.ev?.[0]?.v * 1000000) },
+                                "operatingMargin": { "period": quarterly?.operatingMargin?.[0]?.period, "value": formatNumber(quarterly?.operatingMargin?.[0]?.v) },
+                                "grossMargin": { "period": quarterly?.grossMargin?.[0]?.period, "value": formatNumber(quarterly?.grossMargin?.[0]?.v) },
+                                "bookValue": { "period": quarterly?.bookValue?.[0]?.period, "value": formatNumber(quarterly?.bookValue?.[0]?.v) },
+                                "pb": { "period": quarterly?.pb?.[0]?.period, "value": formatNumber(quarterly?.pb?.[0]?.v) },
+                                "pe": { "period": quarterly?.pe?.[0]?.period, "value": formatNumber(quarterly?.peTTM?.[0]?.v) },
+                                "ps": { "period": quarterly?.ps?.[0]?.period, "value": formatNumber(quarterly?.psTTM?.[0]?.v) },
+                                "cashRatio": { "period": quarterly?.cashRatio?.[0]?.period, "value": formatNumber(quarterly?.cashRatio?.[0]?.v) },
+                                "currentRatio": { "period": quarterly?.currentRatio?.[0]?.period, "value": formatNumber(quarterly?.currentRatio?.[0]?.v) },
+                                "quickRatio": { "period": quarterly?.quickRatio?.[0]?.period, "value": formatNumber(quarterly?.quickRatio?.[0]?.v) },
+                                "roa": { "period": quarterly?.roa?.[0]?.period, "value": formatNumber(quarterly?.roaTTM?.[0]?.v * 100) },
+                                "roe": { "period": quarterly?.roe?.[0]?.period, "value": formatNumber(quarterly?.roeTTM?.[0]?.v * 100) },
                             }
                         }
                         let stats = {
-                            "marketCap": formatNumber(metric?.marketCapitalization),
+                            "marketCap": formatNumber(metric?.marketCapitalization * 1000000),
                             "revenuePerShareAnnual": formatNumber(metric?.revenuePerShareAnnual),
                             "revenuePerShareTTM": formatNumber(metric?.revenuePerShareTTM),
                             "revenueGrowthQuarterlyYoy": formatNumber(metric?.revenueGrowthQuarterlyYoy),

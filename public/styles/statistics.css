@@ -254,6 +254,16 @@
      th,
      td {
          padding: 0.25em;
+         font-size: 0.75em;
+         text-align: center;
+     }
+ }
+
+ @media (max-width: 400px) {
+
+     th,
+     td {
+         padding: 0.1em;
          font-size: 0.5em;
          text-align: center;
      }

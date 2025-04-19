@@ -16,10 +16,6 @@
                 <input type="submit">
             </fieldset>
         </form>
-        <!--
-        <div class="dividend-container">
-            <button class="dividend-button">Dividend Tracker</button>
-        </div> -->
     </section>
     <section class="stats-section">
         {{#if statistics}}
@@ -52,11 +48,11 @@
                                 </tr>
                                 <tr>
                                     <th>Operating Margin</th>
-                                    <td>{{this.quarterly.operatingMargin.value}}</td>
+                                    <td>{{this.quarterly.operatingMargin.value}}%</td>
                                 </tr>
                                 <tr>
                                     <th>Gross Margin</th>
-                                    <td>{{this.quarterly.grossMargin.value}}</td>
+                                    <td>{{this.quarterly.grossMargin.value}}%</td>
                                 </tr>
                                 <tr>
                                     <th>Book Value</th>
@@ -88,11 +84,11 @@
                                 </tr>
                                 <tr>
                                     <th>Return on Assets TTM</th>
-                                    <td>{{this.quarterly.roa.value}}</td>
+                                    <td>{{this.quarterly.roa.value}}%</td>
                                 </tr>
                                 <tr>
                                     <th>Return on Equity TTM</th>
-                                    <td>{{this.quarterly.roe.value}}</td>
+                                    <td>{{this.quarterly.roe.value}}%</td>
                                 </tr>
                             </tbody>
                         </table>
@@ -117,11 +113,11 @@
                                 </tr>
                                 <tr>
                                     <th>Operating Margin</th>
-                                    <td>{{this.annual.operatingMargin.value}}</td>
+                                    <td>{{this.annual.operatingMargin.value}}%</td>
                                 </tr>
                                 <tr>
                                     <th>Gross Margin</th>
-                                    <td>{{this.annual.grossMargin.value}}</td>
+                                    <td>{{this.annual.grossMargin.value}}%</td>
                                 </tr>
                                 <tr>
                                     <th>Book Value</th>
@@ -153,11 +149,11 @@
                                 </tr>
                                 <tr>
                                     <th>Return on Assets</th>
-                                    <td>{{this.annual.roa.value}}</td>
+                                    <td>{{this.annual.roa.value}}%</td>
                                 </tr>
                                 <tr>
                                     <th>Return on Equity</th>
-                                    <td>{{this.annual.roe.value}}</td>
+                                    <td>{{this.annual.roe.value}}%</td>
                                 </tr>
                             </tbody>
                         </table>
@@ -182,19 +178,19 @@
                                 </tr>
                                 <tr>
                                     <th>Revenue Growth Quarterly Yoy</th>
-                                    <td>{{this.stats.revenueGrowthQuarterlyYoy}}</td>
+                                    <td>{{this.stats.revenueGrowthQuarterlyYoy}}%</td>
                                 </tr>
                                 <tr>
                                     <th>Revenue Growth TTM Yoy</th>
-                                    <td>{{this.stats.revenueGrowthTTMYoy}}</td>
+                                    <td>{{this.stats.revenueGrowthTTMYoy}}%</td>
                                 </tr>
                                 <tr>
                                     <th>Revenue Growth 3Y</th>
-                                    <td>{{this.stats.revenueGrowth3Y}}</td>
+                                    <td>{{this.stats.revenueGrowth3Y}}%</td>
                                 </tr>
                                 <tr>
                                     <th>Revenue Growth 5Y</th>
-                                    <td>{{this.stats.revenueGrowth5Y}}</td>
+                                    <td>{{this.stats.revenueGrowth5Y}}%</td>
                                 </tr>
                                 <tr>
                                     <th>Earnings Per Share Annual</th>
@@ -202,19 +198,19 @@
                                 </tr>
                                 <tr>
                                     <th>Earnings Per Share Growth Quarterly</th>
-                                    <td>{{this.stats.epsGrowthQuarterlyYoy}}</td>
+                                    <td>{{this.stats.epsGrowthQuarterlyYoy}}%</td>
                                 </tr>
                                 <tr>
                                     <th>Earnings Per Share Growth TTM</th>
-                                    <td>{{this.stats.epsGrowthTTMYoy}}</td>
+                                    <td>{{this.stats.epsGrowthTTMYoy}}%</td>
                                 </tr>
                                 <tr>
                                     <th>Earnings Per Share Growth 3Y</th>
-                                    <td>{{this.stats.epsGrowth3Y}}</td>
+                                    <td>{{this.stats.epsGrowth3Y}}%</td>
                                 </tr>
                                 <tr>
                                     <th>Earnings Per Share Growth 5Y</th>
-                                    <td>{{this.stats.epsGrowth5Y}}</td>
+                                    <td>{{this.stats.epsGrowth5Y}}%</td>
                                 </tr>
                             </tbody>
                         </table>

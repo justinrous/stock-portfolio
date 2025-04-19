@@ -93,10 +93,8 @@ app.get('/', async (req, res) => {
         let date = finnhubScript.getCurrentDate();
         let earnings;
 
-        // Check if Earnings exist in Redis
-        // earnings = await redisDB.getEarnings();
-        earnings = cache.get('earnings'); // Check if earnings are in cache
-        console.log("Earnings in cache: ", earnings);
+        // Check if Earnings exist in Node Cache
+        earnings = cache.get('earnings');
 
         if (!earnings) {
             // Get earnings from API
@@ -118,16 +116,15 @@ app.get('/', async (req, res) => {
                     earnings[e].revenueActual = finnhubScript.formatNumber(earnings[e].revenueActual);
                 }
             }
-            // Set earnings in node cache
 
-            // Serialize the earnings data to a string before storing it in the cache
+            // Serialize the earnings data to a string and store it in the cache
             let serializedEarnings = JSON.stringify(earnings);
             cache.set('earnings', serializedEarnings, 3600); // Cache for 1 hour
             console.log("Earnings not in cache, retrieved from API: ", serializedEarnings);
         }
         else {
             earnings = JSON.parse(earnings); // Parse the cached data back to an object
-            console.log("Earnings already in cache: ", earnings);
+            console.log("Earnings cache hit.");
         }
 
         res.render('home', {
@@ -152,10 +149,12 @@ app.post('/', async (req, res) => {
     try {
         console.log("Post request received.");
         let earnings = cache.get('earnings');
-        earnings = JSON.parse(earnings); // Parse the cached data back to an object
         if (!earnings) {
             res.send("No earnings data available.");
         }
+        earnings = JSON.parse(earnings); // Parse the cached data back to an object
+
+        // Check if earnings data is available and if the company name is not set
         if (!(earnings[0].name)) {
             let companies = []; // Stores company names for each stock reporting earnings
             let companyProfile;
@@ -166,8 +165,7 @@ app.post('/', async (req, res) => {
                     companies.push(companyProfile.name);
                 }
                 else {
-                    earnings[i].name = null;
-                    companies.push(null);
+                    break;
                 }
             }
             // Set company names in cache
@@ -442,19 +440,44 @@ app.post('/statistics', async (req, res) => {
 
     try {
         let symbol1 = req.body.symbol1;
-        let statistics = [];
-        let symbol1Stats = await finnhubScript.getBasicFinancials(symbol1);
-        symbol1Stats.symbol = symbol1;
+        let statistics = []; // Array to store statistics for each symbol
+        let cacheId = 'statistics-' + symbol1; // Create a unique cache ID for each symbol
+        let symbol1Stats = cache.get(cacheId); // Check if statistics exist in cache
+        if (!symbol1Stats) {
+            // Get statistics from API
+            symbol1Stats = await finnhubScript.getBasicFinancials(symbol1);
+            symbol1Stats.symbol = symbol1;
+            // Serialize the statistics data to a string and store it in the cache
+            let serializedStatistics = JSON.stringify(symbol1Stats);
+            cache.set(cacheId, serializedStatistics, 3600); // Cache for 1 hour
+        }
+        else {
+            console.log("Statistics cache hit.");
+            symbol1Stats = JSON.parse(symbol1Stats); // Parse the cached data back to an object
+        }
         statistics.push(symbol1Stats);
 
         let symbol2Stats;
         let symbol2;
         if (req.body.symbol2) {
             symbol2 = req.body.symbol2;
-            symbol2Stats = await finnhubScript.getBasicFinancials(symbol2);
-            symbol2Stats.symbol = symbol2;
+            let cacheId = 'statistics-' + symbol2; // Create a unique cache ID for each symbol
+            symbol2Stats = cache.get(cacheId); // Check if statistics exist in cache
+            if (!symbol2Stats) {
+                // Get statistics from API
+                symbol2Stats = await finnhubScript.getBasicFinancials(symbol2);
+                symbol2Stats.symbol = symbol2;
+                // Serialize the statistics data to a string and store it in the cache
+                let serializedStatistics = JSON.stringify(symbol2Stats);
+                cache.set(cacheId, serializedStatistics, 3600); // Cache for 1 hour
+            }
+            else {
+                console.log("Statistics cache hit.");
+                symbol2Stats = JSON.parse(symbol2Stats); // Parse the cached data back to an object
+            }
             statistics.push(symbol2Stats);
         }
+        // console.log("Symbol1 Market Cap: ", symbol1Stats.stats.marketCap);
 
         res.render('statistics',
             {
@@ -494,23 +517,43 @@ app.get('/news', (req, res) => {
 app.post('/news', async (req, res) => {
     try {
         let symbol = req.body.symbol;
-
         let to = finnhubScript.getCurrentDate(); // Today's date
-
         let from = getPreviousDate(to);
+        cacheId = 'companyNews-' + symbol; // Create a unique cache ID for each symbol
 
+        let companyNews = cache.get(cacheId);
+        if (!companyNews) {
+            companyNews = await finnhubScript.getCompanyNews({
+                symbol: symbol,
+                from: from,
+                to: to
+            });
+            // Serialize the company news data to a string and store it in the cache
+            let serializedCompanyNews = JSON.stringify(companyNews);
+            cache.set('companyNews', serializedCompanyNews, 3600); // Cache for 1 hour
+        }
+        else {
+            companyNews = JSON.parse(companyNews); // Parse the cached data back to an object
+        }
 
-        let newsResponse = await finnhubScript.getCompanyNews({
-            symbol: symbol,
-            from: from,
-            to: to
-        })
+        console.log("Company News: ", companyNews);
+        /*********************************************************************************
+        // API returns an array of arrays. Code loops through each array and extracts the news object.
+        // News Object properties include:
+            - category
+            - datetime
+            - headline
+            - id
+            - image
+            - related
+            - source
+            - summary
+        *********************************************************************************/
 
-        // Format response data as a list of first 10 properties
         let displayData = [];
         let newsObj;
-        for (let i = 0; i < newsResponse.length; i++) {
-            newsObj = newsResponse[i][1];
+        for (let i = 0; i < companyNews.length; i++) {
+            newsObj = companyNews[i][1];
             displayData.push(newsObj)
         }
 
@@ -530,30 +573,6 @@ app.post('/news', async (req, res) => {
     }
 
 })
-
-/*
-app.post('/dividend', async (req, res) => {
-    try {
-        let { symbol, yield, investmentAmount } = req.body;
-
-        yield = parseFloat(yield);
-        investmentAmount = parseFloat(investmentAmount);
-
-        let dividendRes = await stockScript.calculateDividendYield(
-            {
-                yield: yield,
-                initialInvestment: investmentAmount,
-                reinvest: false
-            })
-
-        return res.json(dividendRes.data);
-    }
-    catch (err) {
-        console.log(err)
-    }
-}) */
-
-
 
 app.listen(PORT, '0.0.0.0', () => {
     console.log(`Server is running on port: ${PORT}`);
