@@ -1,6 +1,10 @@
 <main>
     <form method="post" action="/register">
-        <p>Welcome to Smart Money! Let's get started.</p>
+        {{#if invalidRegister}}
+            <p>Invalid registration. Email already in use.</p>
+        {{else}}
+            <p>Welcome to Smart Money! Let's get started.</p>
+        {{/if}}
         <div>
             <label for="fname">First name: </label>
             <input type="text" id="fname" name="fname" maxlength="50" required>
@@ -15,7 +19,7 @@
         </div>
         <div>
             <label for="password">Create a password: </label>
-            <input type="password" name="password" id="password" maxlength="100" required>
+            <input type="password" name="password" id="password" minlength="8" maxlength="50" required>
         </div>
         <input type="submit" id="submit">
     </form>

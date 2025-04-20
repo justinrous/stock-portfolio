@@ -54,6 +54,11 @@ form a:hover {
     color: gold;
 }
 
+form input {
+    border: 1px solid gold;
+    background-color: azure;
+}
+
 #submit {
     width: 4.5em;
     padding: 0.2em;
@@ -71,6 +76,6 @@ form a:hover {
 }
 
 #welcome {
-    color: greenyellow;
+    color: rgb(200, 166, 80);
     font-size: 2em;
 }

@@ -34,7 +34,10 @@ app.use(session({
     cookie: { secure: false, httpOnly: true, sameSite: false }
 }))
 
-// Functions
+/*******************************************************************************
+ * * Helper Functions
+ *******************************************************************************/
+
 
 async function hashPassword(password) {
     try {
@@ -83,6 +86,32 @@ function getPreviousDate(date) {
     }
 }
 
+async function updatePortfolioCache(userId) {
+    try {
+        let portfolioCacheId = 'portfolio-' + userId; // Create a unique cache ID for each user
+        let portfolio = await db.getUserPortfolio(userId);
+        // Serialize the portfolio data to a string and store it in the cache
+        let serializedPortfolio = JSON.stringify(portfolio);
+        cache.set(portfolioCacheId, serializedPortfolio, 3600); // Cache for 2 minutes
+    }
+    catch (err) {
+        console.log("Error updating portfolio cache: ", err)
+    }
+}
+
+async function updateWatchlistCache(userId) {
+    try {
+        let watchlistCacheId = 'watchlist-' + userId; // Create a unique cache ID for each user
+        let watchlist = await db.getUserWatchlist(userId);
+        // Serialize the watchlist data to a string and store it in the cache
+        let serializedWatchlist = JSON.stringify(watchlist);
+        cache.set(watchlistCacheId, serializedWatchlist, 3600); // Cache for 2 minutes
+    }
+    catch (err) {
+        console.log("Error updating watchlist cache: ", err)
+    }
+}
+
 /************************************************************************************
  ************************      Routes    *******************************************
  **********************************************************************************/
@@ -116,13 +145,11 @@ app.get('/', async (req, res) => {
                     earnings[e].revenueActual = finnhubScript.formatNumber(earnings[e].revenueActual);
                 }
             }
-            if (earnings.length > 0) {
-                // Serialize the earnings data to a string and store it in the cache
-                let serializedEarnings = JSON.stringify(earnings);
-                cache.set('earnings', serializedEarnings, 3600); // Cache for 1 hour
-                console.log("Earnings not in cache, retrieved from API: ", serializedEarnings);
-            }
 
+            // Serialize the earnings data to a string and store it in the cache
+            let serializedEarnings = JSON.stringify(earnings);
+            cache.set('earnings', serializedEarnings, 3600); // Cache for 1 hour
+            console.log("Earnings not in cache, retrieved from API: ", serializedEarnings);
         }
         else {
             earnings = JSON.parse(earnings); // Parse the cached data back to an object
@@ -151,13 +178,14 @@ app.post('/', async (req, res) => {
     try {
         console.log("Post request received.");
         let earnings = cache.get('earnings');
+        earnings = JSON.parse(earnings); // Parse the cached data back to an object
 
         // If earnings data is empty, send response to client and return
-        if (!(earnings) || earnings.length == 0) {
+        if (!earnings || earnings.length === 0) {
+            console.log("No earnings data available.");
             res.send("No earnings data available.");
             return;
         }
-        earnings = JSON.parse(earnings); // Parse the cached data back to an object
 
         // Check if earnings data is available and if the company name is not set
         if (!(earnings[0].name)) {
@@ -230,7 +258,7 @@ app.post('/login', async (req, res) => {
 
 app.get('/register', (req, res) => {
     try {
-        res.render('register', { title: 'Register', isLoggedIn: req.session.isLoggedIn, stylesheet: './styles/login.css' })
+        res.render('register', { title: 'Register', invalidRegister: req.session.invalidRegister, isLoggedIn: req.session.isLoggedIn, stylesheet: './styles/login.css' })
     }
     catch (err) {
         res.status(500).render('error', {
@@ -242,18 +270,38 @@ app.get('/register', (req, res) => {
 
 app.post('/register', async (req, res) => {
     try {
-        // Query Database to insert new user
-        // fname, lname, email, hashed_password
-        let hashedPassword = await hashPassword(req.body.password);
 
-        let userID = await db.addUser({ firstName: req.body.fname, lastName: req.body.lname, email: req.body.email, hashedPassword: hashedPassword })
+        // Check if user already exists
+        let user = await db.getUserId(req.body.email);
+        if (user) {
+            // User already exists
+            req.session.invalidRegister = true;
+            console.log("User already exists: ", user);
+            res.redirect('/register');
+            return;
+        }
+        else {
+            // Query Database to insert new user
+            // fname, lname, email, hashed_password
+            let hashedPassword = await hashPassword(req.body.password);
 
-        // Set up session
-        req.session.isLoggedIn = true;
-        req.session.email = req.body.email;
-        req.session.initials = await db.getInitials(req.body.email);
+            let affectedRows = await db.addUser({ firstName: req.body.fname, lastName: req.body.lname, email: req.body.email, hashedPassword: hashedPassword });
+            if (affectedRows == 0) {
+                // Unable to add user to database
+                req.session.invalidRegister = true;
+                res.redirect('/register');
+                return;
+            }
+            else {
+                // Set up session
+                req.session.isLoggedIn = true;
+                req.session.email = req.body.email;
+                req.session.initials = await db.getInitials(req.body.email);
+                req.session.invalidRegister = false;
+            }
 
-        res.redirect('/');
+            res.redirect('/');
+        }
     }
     catch (err) {
         res.status(500).render('error', {
@@ -404,6 +452,7 @@ app.post('/addStockToPortfolio', async (req, res) => {
         };
 
         let portfolioId = await db.addStockToPortfolio(stock);
+        console.log("Portfolio ID: ", portfolioId);
 
         // Redirect to portfolio
         res.redirect('/portfolio')
@@ -632,3 +681,7 @@ app.post('/news', async (req, res) => {
 app.listen(PORT, '0.0.0.0', () => {
     console.log(`Server is running on port: ${PORT}`);
 })
+
+exports.updatePortfolioCache = updatePortfolioCache;
+exports.updateWatchlistCache = updateWatchlistCache;
+

@@ -1,17 +1,17 @@
 <main>
     <form action="/login" method="post">
         {{#if invalidLogin}}
-        <p>Incorrect email or password. Please try again.</p>
+            <p>Incorrect email or password. Please try again.</p>
         {{else}}
-        <p id="welcome">Welcome! Login Below</p>
+            <p id="welcome">Welcome! Login Below</p>
         {{/if}}
         <div>
             <label for="email">Email: </label>
-            <input type="email" name="email" id="email">
+            <input type="email" name="email" id="email" required>
         </div>
         <div>
             <label for="password">Password: </label>
-            <input type="password" name="password" id="password">
+            <input type="password" name="password" id="password" required>
         </div>
         <input type="submit" name="submit" id="submit">
         <p>Don't have an account? <a href="/register">Register Here</a></p>

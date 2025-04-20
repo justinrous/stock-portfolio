@@ -1,6 +1,7 @@
 const mysql = require('mysql2');
 const bcrypt = require('bcrypt');
 require('dotenv').config();
+const index = require('../index.js');
 
 
 // Create a Connection to Database
@@ -16,7 +17,7 @@ connection.connect((err) => {
         return console.log("Error connecting to the database: " + console.error);
     }
     else {
-        console.log("Connected to the datbase")
+        console.log("Connected to the MySQL server.");
     }
 })
 
@@ -31,7 +32,14 @@ async function addUser(user) {
         let stmt = "INSERT INTO users (firstName, lastName, email, password) VALUES (?, ?, ?, ?)";
         let params = [user.firstName, user.lastName, user.email, user.hashedPassword];
         let [results] = await connection.query(stmt, params);
-        return results.insertId;
+        if (results.affectedRows > 0) {
+            console.log("User added successfully");
+            return results.affectedRows
+        }
+        else {
+            console.log("User not added to database");
+            return results.affectedRows;
+        }
     }
     catch (err) {
         console.log("Error adding user", err);
@@ -62,21 +70,35 @@ async function compareCreds(email, password) {
 async function getInitials(email) {
     try {
         let query = "SELECT firstName, lastName FROM users WHERE email = ?";
-        let [[result]] = await connection.query(query, [email])
-        let fname = result.firstName[0];
-        let lname = result.lastName[0];
-        return fname + lname;
+        let [result] = await connection.query(query, [email]);
+        if (result.length === 0) {
+            console.log("No user found with that email address");
+            return null;
+        }
+        else {
+            console.log("User found with that email address");
+            let fname = result.firstName[0];
+            let lname = result.lastName[0];
+            return fname + lname;
+        }
     }
     catch (err) {
-        console.log("Error retrieving initials", err)
+        console.log("Error retrieving initials", err);
     }
 }
 
 async function getUserId(email) {
     try {
         let query = "SELECT id FROM users WHERE email = ?";
-        let [[result]] = await connection.query(query, [email]);
-        return result.id;
+        let [result] = await connection.query(query, [email]); // Returns array of arrays. Destructure to get first element of first array
+        if (result.length === 0) {
+            console.log("No user found with that email address");
+            return 0;
+        }
+        else {
+            console.log("User found with that email address");
+            return result[0].id;
+        }
     }
     catch (err) {
         console.log("Error retrieving userId from database: ", err)
@@ -107,9 +129,18 @@ async function getUserWatchlist(id) {
 
 async function addStockToPortfolio({ userId, ticker, qty }) {
     try {
+
+        // Check if stock already exists in portfolio
+
+        // If stock exists, update quantity
+        // UpdateQuantity()
+
         let query = "INSERT INTO holdings (userId, ticker, quantity) VALUES (?, ?, ?)"
         let params = [userId, ticker, qty]
         let [result] = await connection.query(query, params);
+
+        // Update portfolio cache
+        await index.updatePortfolioCache(userId);
         return result.insertId;
     }
     catch (err) {
@@ -120,8 +151,17 @@ async function addStockToPortfolio({ userId, ticker, qty }) {
 async function addStockToWatchList({ userId, ticker }) {
     try {
         let query = "INSERT INTO watchlist (userId, ticker) VALUES (?, ?)";
-        let [result] = await connection.query(query, [userId, ticker])
-        return result.insertId;
+        let [result] = await connection.query(query, [userId, ticker]);
+        if (result.affectedRows > 0) {
+
+            // Update watchlist cache
+            await index.updateWatchlistCache(userId);
+            return result.affectedRows;
+        }
+        else {
+            return "Query unsuccessful";
+        }
+        // return result.insertId;
     }
     catch (err) {
         console.log("Error adding stock to watchlist: ", err)
@@ -130,14 +170,23 @@ async function addStockToWatchList({ userId, ticker }) {
 
 async function deleteStockFromPortfolio({ id, ticker }) {
     let query = "DELETE FROM holdings WHERE userId = ? AND ticker = ?"
-    let [result] = await connection.query(query, [id, ticker])
+    let [result] = await connection.query(query, [id, ticker]);
+
+    // Update stock price caching for deleted stock
+    await index.updatePortfolioCache(id);
+
     return result;
 }
 
 async function deleteStockFromWatchlist({ id, ticker }) {
     try {
         let query = "DELETE FROM watchlist WHERE userId = ? AND ticker = ?"
-        let [result] = await connection.query(query, [id, ticker])
+        let [result] = await connection.query(query, [id, ticker]);
+
+        // Update stock price caching for deleted stock
+        await index.updateWatchlistCache(id);
+
+
         return result;
     }
     catch (err) {
