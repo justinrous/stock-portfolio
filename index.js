@@ -116,11 +116,13 @@ app.get('/', async (req, res) => {
                     earnings[e].revenueActual = finnhubScript.formatNumber(earnings[e].revenueActual);
                 }
             }
+            if (earnings.length > 0) {
+                // Serialize the earnings data to a string and store it in the cache
+                let serializedEarnings = JSON.stringify(earnings);
+                cache.set('earnings', serializedEarnings, 3600); // Cache for 1 hour
+                console.log("Earnings not in cache, retrieved from API: ", serializedEarnings);
+            }
 
-            // Serialize the earnings data to a string and store it in the cache
-            let serializedEarnings = JSON.stringify(earnings);
-            cache.set('earnings', serializedEarnings, 3600); // Cache for 1 hour
-            console.log("Earnings not in cache, retrieved from API: ", serializedEarnings);
         }
         else {
             earnings = JSON.parse(earnings); // Parse the cached data back to an object
@@ -149,8 +151,11 @@ app.post('/', async (req, res) => {
     try {
         console.log("Post request received.");
         let earnings = cache.get('earnings');
-        if (!earnings) {
+
+        // If earnings data is empty, send response to client and return
+        if (!(earnings) || earnings.length == 0) {
             res.send("No earnings data available.");
+            return;
         }
         earnings = JSON.parse(earnings); // Parse the cached data back to an object
 
@@ -288,32 +293,82 @@ app.get('/portfolio', async (req, res) => {
         if (req.session.email) {
             // Get userId
             id = await db.getUserId(req.session.email);
-            // Get user portfolio
-            portfolio = await db.getUserPortfolio(id);
-            watchlist = await db.getUserWatchlist(id);
-            console.log("Portfolio: ", portfolio);
-            console.log("Watchlist: ", watchlist);
+            portfolioCacheId = 'portfolio-' + id; // Create a unique cache ID for each user
+            watchlistCacheId = 'watchlist-' + id; // Create a unique cache ID for each user
+            // Check if portfolio exists in cache
+            portfolio = cache.get(portfolioCacheId);
+            if (!portfolio) {
+                // Get portfolio from database
+                portfolio = await db.getUserPortfolio(id);
+                // Serialize the portfolio data to a string and store it in the cache
+                let serializedPortfolio = JSON.stringify(portfolio);
+                cache.set(portfolioCacheId, serializedPortfolio, 3600); // Cache for 1 hour
+            }
+            else {
+                portfolio = JSON.parse(portfolio); // Parse the cached data back to an object
+                console.log("Portfolio cache hit.");
+            }
+            // Check if watchlist exists in cache
+            watchlist = cache.get(watchlistCacheId);
+            if (!watchlist) {
+                // Get watchlist from database
+                watchlist = await db.getUserWatchlist(id);
+                // Serialize the watchlist data to a string and store it in the cache
+                let serializedWatchlist = JSON.stringify(watchlist);
+                cache.set(watchlistCacheId, serializedWatchlist, 3600); // Cache for 1 hour
+            }
+            else {
+                watchlist = JSON.parse(watchlist); // Parse the cached data back to an object
+                console.log("Watchlist cache hit.");
+            }
 
             // Get stock price for each stock ticker in portfolio
             await (async () => {
                 for (let stock of portfolio) {
-                    let prices = await finnhubScript.getStockPrice(stock.ticker);
-                    console.log(prices);
-                    stock.price = finnhubScript.formatNumber(parseFloat(prices[0]));
-                    stock.openPrice = finnhubScript.formatNumber(parseFloat(prices[1]));
-                    stock.highPrice = finnhubScript.formatNumber(parseFloat(prices[2]));
-                    stock.lowPrice = finnhubScript.formatNumber(parseFloat(prices[3]));
+                    // Check if stock price is already in cache
+                    let stockCacheId = 'stockPrice-' + stock.ticker; // Create a unique cache ID for each stock ticker
+                    let stockPrice = cache.get(stockCacheId);
+                    if (!stockPrice) {
+                        // Get stock price from API
+                        stockPrice = await finnhubScript.getStockPrice(stock.ticker);
+                        // Serialize the stock price data to a string and store it in the cache
+                        let serializedStockPrice = JSON.stringify(stockPrice);
+                        cache.set(stockCacheId, serializedStockPrice, 120); // Cache for 2 minutes
+                    }
+                    else {
+                        stockPrice = JSON.parse(stockPrice); // Parse the cached data back to an object
+                        console.log("Stock price cache hit.");
+                    }
+                    // Set stock price in portfolio object
+                    stock.price = finnhubScript.formatNumber(parseFloat(stockPrice[0]));
+                    stock.openPrice = finnhubScript.formatNumber(parseFloat(stockPrice[1]));
+                    stock.highPrice = finnhubScript.formatNumber(parseFloat(stockPrice[2]));
+                    stock.lowPrice = finnhubScript.formatNumber(parseFloat(stockPrice[3]));
                 }
             })();
 
             // Get stock price for each stock ticker in watchlist
             await (async () => {
                 for (let stock of watchlist) {
-                    let prices = await finnhubScript.getStockPrice(stock.ticker);
-                    stock.price = finnhubScript.formatNumber(parseFloat(prices[0]));
-                    stock.openPrice = finnhubScript.formatNumber(parseFloat(prices[1]));
-                    stock.highPrice = finnhubScript.formatNumber(parseFloat(prices[2]));
-                    stock.lowPrice = finnhubScript.formatNumber(parseFloat(prices[3]));
+                    // Check if stock price is already in cache
+                    let stockCacheId = 'stockPrice-' + stock.ticker; // Create a unique cache ID for each stock ticker
+                    let stockPrice = cache.get(stockCacheId);
+                    if (!stockPrice) {
+                        // Get stock price from API
+                        stockPrice = await finnhubScript.getStockPrice(stock.ticker);
+                        // Serialize the stock price data to a string and store it in the cache
+                        let serializedStockPrice = JSON.stringify(stockPrice);
+                        cache.set(stockCacheId, serializedStockPrice, 120); // Cache for 2 minutes
+                    }
+                    else {
+                        stockPrice = JSON.parse(stockPrice); // Parse the cached data back to an object
+                        console.log("Stock price cache hit.");
+                    }
+                    // Set stock price in watchlist object
+                    stock.price = finnhubScript.formatNumber(parseFloat(stockPrice[0]));
+                    stock.openPrice = finnhubScript.formatNumber(parseFloat(stockPrice[1]));
+                    stock.highPrice = finnhubScript.formatNumber(parseFloat(stockPrice[2]));
+                    stock.lowPrice = finnhubScript.formatNumber(parseFloat(stockPrice[3]));
                 }
             })();
 
@@ -533,10 +588,10 @@ app.post('/news', async (req, res) => {
             cache.set('companyNews', serializedCompanyNews, 3600); // Cache for 1 hour
         }
         else {
+            console.log("Company news cache hit.");
             companyNews = JSON.parse(companyNews); // Parse the cached data back to an object
         }
 
-        console.log("Company News: ", companyNews);
         /*********************************************************************************
         // API returns an array of arrays. Code loops through each array and extracts the news object.
         // News Object properties include:

@@ -99,6 +99,10 @@
      opacity: 1;
  }
 
+ #nav-bar-not-logged-in a {
+     margin: 0 1em;
+ }
+
  /* ------------------------------------------------------------------
 -------------- Responsive Design Queries -------------------------------------
 ---------------------------------------------------------------------*/
@@ -141,5 +145,18 @@
  @media (min-height: 1500px) {
      nav .nav-bar-container {
          top: 7vh;
+     }
+ }
+
+ @media (max-width: 800px) {
+     #nav-bar-not-logged-in {
+         display: flex;
+         flex-direction: column;
+         align-items: center;
+         padding-top: 0.10em;
+     }
+
+     #nav-bar-not-logged-in a {
+         margin: 0.1em 0;
      }
  }
