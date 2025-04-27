@@ -5,7 +5,7 @@ Node Express with Handlebars templating engine, JavaScript, HTHL, and CSS.
 ## Installation
 **Prerequisites**
 - MySQL server either running locally or over a web service
-- Request a free API key from [Finnhub] (https://finnhub.io/)
+- Request a free API key from [Finnhub](https://finnhub.io/)
 **Installation**
 - Clone repository to a local folder
 - Create process.env file locally and add database and API credentials
