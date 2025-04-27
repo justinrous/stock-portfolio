@@ -10,16 +10,40 @@ const finnhubClient = new finnhub.DefaultApi();
 
 
 function formatNumber(num) {
-    // Function accepts a number and formats it as a string with commas for readability
-    if (num == null) {
-        return null;
-    }
-    else {
-        return num.toLocaleString('en-US', {
+    // Formats a number or a string as a string with commas and two decimal places
+    // returns: string with commas and up to two decimal places
+    try {
+        if (num === null || num === undefined || num === NaN) {
+            return null;
+        }
+        else if ((typeof num != 'number')) {
+            num = parseFloat(num);
+            if (isNaN(num)) {
+                return null;
+            }
+        }
+        let result = num.toLocaleString('en-US', {
             style: 'decimal',
             minimumFractionDigits: 0,
             maximumFractionDigits: 2
         });
+        let decimalIndex = result.indexOf('.');
+        if (decimalIndex !== -1) {
+            if (result.length - decimalIndex < 3) {
+                result += '0';
+                return result;
+            }
+            else {
+                return result;
+            }
+        }
+        else {
+            return result;
+        }
+    }
+    catch (err) {
+        console.log("Error formatting number: ", err);
+        return null;
     }
 }
 
@@ -35,10 +59,11 @@ async function getStockPrice(ticker) {
             finnhubClient.quote(ticker, (err, data, response) => {
                 if (err) {
                     console.log("Error with API call: ", error);
-                    reject(false);
+                    reject(null);
                 }
                 else {
                     try {
+                        console.log("Stock data from API call: ", data);
                         let stockPrice = data?.c;
                         let openPrice = data?.o;
                         let highPrice = data?.h;
@@ -47,7 +72,7 @@ async function getStockPrice(ticker) {
                     }
                     catch (err) {
                         console.log("Error formatting data: ", err);
-                        reject(false);
+                        reject(null);
                     }
                 }
             })

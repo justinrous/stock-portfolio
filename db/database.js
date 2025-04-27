@@ -12,28 +12,36 @@ const connection = mysql.createConnection({
     database: process.env.DB_NAME,
 }).promise()
 
-connection.connect((err) => {
-    if (err) {
-        return console.log("Error connecting to the database: " + console.error);
-    }
-    else {
+async function connectToDatabase() {
+    try {
+        await connection.connect();
         console.log("Connected to the MySQL server.");
+    } catch (err) {
+        console.error("Error connecting to the database:", err.message);
+        process.exit(1); // optional: exit if critical
     }
-})
+}
+connectToDatabase();
+
 
 async function addUser(user) {
     /*
-        Creates a new user in the database
+        Creates a new user in the database.
         params:
             user: object containing user properties:
                 firstName, lastName, email, hashedPassword
+        return:
+            int: number of affected rows
+                0: user not added to database
+                1: user added to database
     */
     try {
         let stmt = "INSERT INTO users (firstName, lastName, email, password) VALUES (?, ?, ?, ?)";
         let params = [user.firstName, user.lastName, user.email, user.hashedPassword];
         let [results] = await connection.query(stmt, params);
+        console.log("Results: ", results);
         if (results.affectedRows > 0) {
-            console.log("User added successfully");
+            console.log("User successfully added to database");
             return results.affectedRows
         }
         else {
@@ -71,14 +79,15 @@ async function getInitials(email) {
     try {
         let query = "SELECT firstName, lastName FROM users WHERE email = ?";
         let [result] = await connection.query(query, [email]);
+        console.log(result);
         if (result.length === 0) {
             console.log("No user found with that email address");
             return null;
         }
         else {
             console.log("User found with that email address");
-            let fname = result.firstName[0];
-            let lname = result.lastName[0];
+            let fname = result[0].firstName[0];
+            let lname = result[0].lastName[0];
             return fname + lname;
         }
     }

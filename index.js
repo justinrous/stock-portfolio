@@ -112,6 +112,10 @@ async function updateWatchlistCache(userId) {
     }
 }
 
+async function isValidStock(params) {
+    return;
+}
+
 /************************************************************************************
  ************************      Routes    *******************************************
  **********************************************************************************/
@@ -379,6 +383,9 @@ app.get('/portfolio', async (req, res) => {
                     if (!stockPrice) {
                         // Get stock price from API
                         stockPrice = await finnhubScript.getStockPrice(stock.ticker);
+                        if (!stockPrice) {
+                            stockPrice = stockPrice[0]; // Get the first element of the array
+                        }
                         // Serialize the stock price data to a string and store it in the cache
                         let serializedStockPrice = JSON.stringify(stockPrice);
                         cache.set(stockCacheId, serializedStockPrice, 120); // Cache for 2 minutes
@@ -444,6 +451,8 @@ app.post('/addStockToPortfolio', async (req, res) => {
 
         // Check if stock already in user's portfolio
 
+        // Verify stock ticker is valid
+
         // Insert stock into portfolio
         let stock = {
             userId: userId,
@@ -467,6 +476,10 @@ app.post('/addStockToPortfolio', async (req, res) => {
 app.post('/addStockToWatchlist', async (req, res) => {
     try {
         let userId = await db.getUserId(req.session.email);
+
+        // Check if stock already in user's portfolio
+
+        // Verify stock ticker is valid
 
         let stock = {
             userId: userId,
