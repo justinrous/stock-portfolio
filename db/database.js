@@ -205,8 +205,9 @@ async function deleteStockFromWatchlist({ id, ticker }) {
 }
 
 
-// currentStockPrice table in database
+// Removed this code to improve scalability and performance. Stock prices are now stored in a cache and updated every 2-5 minutes.
 
+/*
 async function addCurrentStockPrice([ticker, date, stockArray]) {
     try {
         let query = "INSERT INTO stockPrices(ticker, stockDate, openPrice, highPrice, lowPrice, closePrice, volume) VALUES" +
@@ -288,7 +289,7 @@ async function getEarnings(date) {
     catch (err) {
         console.log("Error retrieving earnings data from database: ", err)
     }
-}
+} */
 
 exports.addUser = addUser;
 exports.compareCreds = compareCreds;
@@ -300,10 +301,10 @@ exports.getUserPortfolio = getUserPortfolio;
 exports.getUserWatchlist = getUserWatchlist;
 exports.deleteStockFromPortfolio = deleteStockFromPortfolio;
 exports.deleteStockFromWatchlist = deleteStockFromWatchlist;
-exports.addCurrentStockPrice = addCurrentStockPrice;
-exports.getCurrentStockPrice = getCurrentStockPrice;
-exports.addEarnings = addEarnings;
-exports.getEarnings = getEarnings;
+// exports.addCurrentStockPrice = addCurrentStockPrice;
+// exports.getCurrentStockPrice = getCurrentStockPrice;
+// exports.addEarnings = addEarnings;
+// exports.getEarnings = getEarnings;
 
 
 
