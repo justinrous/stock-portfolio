@@ -4,4 +4,3 @@ api_key.txt
 .vscode/
 .env
 redisClient.js
-__tests__/
