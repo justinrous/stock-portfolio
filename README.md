@@ -19,7 +19,9 @@ The application also integrates with an external financial API to fetch and disp
 
 
 ### To-do List
-- Deploy database and backend to a cloud-hosted platform
+- Create responsive CSS for portfolio page for mobile devices.
+- Allow for update CRUD operations on portfolio page.
+- Continue to write extensive unit tests and refactor code. 
 - 
   
 
