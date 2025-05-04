@@ -1,5 +1,5 @@
 # Overview
-A financial investment website that can be used to track a portfolio of stock, research financial statistics about individual stocks, current stock news, and more. 
+This is a full-stack financial investment platform that allows users to track a personalized portfolio of stocks, view real-time price data, and access key financial statistics and news for individual companies. Designed with both functionality and user experience in mind, the application integrates data from the FinnHub.io API to provide up-to-date market insights.  
 
 ![Statistics Page](https://github.com/justinrous/stock-portfolio/blob/main/public/images/portfolio_manager.JPG)
 ![Portfolio Page](https://github.com/justinrous/stock-portfolio/blob/main/public/images/portfolio_manager1.JPG)
