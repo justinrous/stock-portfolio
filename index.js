@@ -1,7 +1,7 @@
 const express = require('express');
 const exphbs = require('express-handlebars');
 const path = require('path');
-const mysql = require('mysql2')
+const mysql = require('mysql2/promise')
 const db = require('./db/database.js');
 const session = require('express-session');
 const { hash } = require('crypto');
@@ -702,9 +702,12 @@ app.post('/news', async (req, res) => {
 
 })
 
-app.listen(PORT, '0.0.0.0', () => {
-    console.log(`Server is running on port: ${PORT}`);
-})
+// Test DB before starting server
+db.testDatabaseConnection().then(() => {
+    app.listen(PORT, () => {
+        console.log(`Server listening on port ${PORT}`);
+    });
+});
 
 exports.updatePortfolioCache = updatePortfolioCache;
 exports.updateWatchlistCache = updateWatchlistCache;
