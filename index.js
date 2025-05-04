@@ -496,6 +496,17 @@ app.post('/addStockToWatchlist', async (req, res) => {
     }
 })
 
+/*
+app.post('/updateStockQty', async (req, res) => {
+    try {
+
+    }
+    catch (err) {
+        console.log('Error updating stock quantity: ', err);
+        return false;
+    }
+}) */
+
 app.delete('/deleteStockFromPortfolio', async (req, res) => {
     try {
         // Call Delete Method

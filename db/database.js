@@ -10,6 +10,7 @@ const connection = mysql.createConnection({
     user: process.env.DB_USER,
     password: process.env.DB_PASSWORD,
     database: process.env.DB_NAME,
+    port: 3306
 }).promise()
 
 async function connectToDatabase() {
@@ -36,7 +37,7 @@ async function addUser(user) {
                 1: user added to database
     */
     try {
-        let stmt = "INSERT INTO users (firstName, lastName, email, password) VALUES (?, ?, ?, ?)";
+        let stmt = "INSERT INTO users (firstName, lastName, email, user_password) VALUES (?, ?, ?, ?)";
         let params = [user.firstName, user.lastName, user.email, user.hashedPassword];
         let [results] = await connection.query(stmt, params);
         console.log("Results: ", results);
@@ -63,9 +64,9 @@ async function compareCreds(email, password) {
     */
     try {
         // Retrieve plain text password
-        let query = "SELECT password FROM users WHERE email = ?";
+        let query = "SELECT user_password FROM users WHERE email = ?";
         let [[hashedPassword]] = await connection.query(query, [email]);
-        hashedPassword = hashedPassword.password;
+        hashedPassword = hashedPassword.user_password;
         let compareResult = await bcrypt.compare(password, hashedPassword);
         return compareResult;
     }
