@@ -1,6 +1,6 @@
 // This script is for the home page of the web application.
 
-let serverUrl = 'http://localhost:5000/';
+let serverUrl = '/';
 window.onload = function () {
     // Check if the user is logged in by checking the sessionStorage
     fetch(serverUrl, {

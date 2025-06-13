@@ -13,7 +13,7 @@ const finnhubScript = require('./stock_scripts/finnhubApiScript.js');
 const nodeCache = require('node-cache');
 
 const app = express();
-const PORT = 5000;
+const PORT = process.env.PORT;
 
 // Create a cache instance
 const cache = new nodeCache({ stdTTL: 3600, checkperiod: 120 });
@@ -703,11 +703,17 @@ app.post('/news', async (req, res) => {
 })
 
 // Test DB before starting server
+
 db.testDatabaseConnection().then(() => {
     app.listen(PORT, () => {
         console.log(`Server listening on port ${PORT}`);
     });
 });
+
+/*
+app.listen(PORT, () => {
+    console.log(`Server listening on port ${PORT}`);
+}); */
 
 exports.updatePortfolioCache = updatePortfolioCache;
 exports.updateWatchlistCache = updateWatchlistCache;

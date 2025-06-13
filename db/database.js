@@ -3,7 +3,7 @@ const bcrypt = require('bcrypt');
 require('dotenv').config();
 const index = require('../index.js');
 
-
+/*
 // Create a Connection to Database
 const pool = mysql.createPool({
     host: process.env.DB_HOST,
@@ -14,7 +14,20 @@ const pool = mysql.createPool({
     waitForConnections: true,
     connectionLimit: 10,
     queueLimit: 0
+}); */
+
+// Create a Connection to Database
+const pool = mysql.createPool({
+    socketPath: process.env.INSTANCE_CONNECTION_NAME,
+    user: process.env.DB_USER,
+    password: process.env.DB_PASSWORD,
+    database: process.env.DB_NAME,
+    waitForConnections: true,
+    connectionLimit: 10,
+    queueLimit: 0
 });
+
+
 
 // Test a connection immediately to confirm the DB is reachable
 async function testDatabaseConnection() {
@@ -23,7 +36,7 @@ async function testDatabaseConnection() {
         console.log("Successfully connected to the MySQL database.");
         connection.release(); // Release it back to the pool
     } catch (err) {
-        console.error("Error connecting to the MySQL database:", err.message);
+        console.error("Error connecting to the MySQL database:", err);
         process.exit(1);
     }
 }

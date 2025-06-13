@@ -91,7 +91,7 @@ dividendBtn.addEventListener('click', (e) => {
     input.setAttribute('id', 'ticker');
     input.setAttribute('name', 'ticker');
     input.setAttribute('value', symbol);
-    // Insert Elements into div container 
+    // Insert Elements into div container
     formDiv.appendChild(label);
     formDiv.appendChild(input);
 
@@ -106,7 +106,7 @@ dividendBtn.addEventListener('click', (e) => {
     input2.setAttribute('id', 'yield');
     input2.setAttribute('name', 'yield');
     input2.setAttribute('value', yield);
-    // Insert Elements into div container 
+    // Insert Elements into div container
     formDiv2.appendChild(label2);
     formDiv2.appendChild(input2);
 
@@ -120,11 +120,11 @@ dividendBtn.addEventListener('click', (e) => {
     input3.setAttribute('type', 'text');
     input3.setAttribute('id', 'investment');
     input3.setAttribute('name', 'investment');
-    // Insert Elements into div container 
+    // Insert Elements into div container
     formDiv3.appendChild(label3);
     formDiv3.appendChild(input3);
 
-    // Create submit button 
+    // Create submit button
     let submit = document.createElement('input');
     submit.setAttribute('type', 'submit');
 
@@ -135,7 +135,7 @@ dividendBtn.addEventListener('click', (e) => {
         element.classList.add('formDiv')
     })
 
-    // Insert Form into DOM 
+    // Insert Form into DOM
     form.appendChild(formDiv);
     form.appendChild(formDiv2);
     form.appendChild(formDiv3);

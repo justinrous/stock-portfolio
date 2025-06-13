@@ -1,16 +1,16 @@
 SET FOREIGN_KEY_CHECKS = 0;
 
 CREATE TABLE IF NOT EXISTS users (
-    id int AUTO_INCREMENT NOT NULL,
+    id int AUTO_INCREMENT NOT NULL unique,
     firstName varchar(50) NOT NULL,
     lastName varchar(50) NOT NULL,
     email varchar(50) NOT NULL unique,
-    password varchar(100) NOT NULL,
+    user_password varchar(100) NOT NULL,
     PRIMARY KEY(id)
 );
 
 CREATE TABLE IF NOT EXISTS holdings (
-    id int AUTO_INCREMENT NOT NULL,
+    id int AUTO_INCREMENT NOT NULL unique,
     userId int NOT NULL,
     ticker varchar(20) NOT NULL,
     quantity DECIMAL(10,2) NOT NULL,
@@ -20,7 +20,7 @@ CREATE TABLE IF NOT EXISTS holdings (
 );
 
 CREATE TABLE IF NOT EXISTS watchlist (
-    id int AUTO_INCREMENT NOT NULL,
+    id int AUTO_INCREMENT NOT NULL unique,
     userId int NOT NULL,
     ticker varchar(20) NOT NULL,
     UNIQUE (ticker, userId),
