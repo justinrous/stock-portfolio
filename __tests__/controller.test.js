@@ -90,3 +90,19 @@ describe('Tests various functions in getStockPrice() function', () => {
         expect(mockQuote).toHaveBeenCalled();  // Verify that `quote` was called
     });
 });
+
+/***********************************
+ * Tests for getCurrentDate() function
+ *************************************/
+describe('Tests for getCurrentDate() function', () => {
+    test('returns a string in the format YYYY-MM-DD', () => {
+        const result = stock_script.getCurrentDate();
+        const dateRegex = /^\d{4}-\d{2}-\d{2}$/;  // Regex to match YYYY-MM-DD format
+        expect(result).toMatch(dateRegex);
+    });
+
+
+/***********************************
+ * Tests for GetPreviousDate() function
+ * ***********************************/
+

@@ -191,6 +191,23 @@ async function getCompanyNews({ symbol, from, to }) {
     })
 }
 
+async function getMarketNews() {
+    return new Promise((resolve, reject) => {
+        finnhubClient.marketNews('general', {}, (error, data, response) => {
+            if (error) {
+                console.log(error);
+                reject(error);
+            }
+            else {
+                // console.log(data);
+                // let data2 = Object.entries(data);
+                // let data3 = data2.slice(0, 10);
+                resolve(data);
+            }
+        })
+    })
+}
+
 
 async function getEarnings(date) {
     return new Promise((resolve, reject) => {
@@ -233,5 +250,6 @@ exports.getCompanyProfile = getCompanyProfile;
 exports.formatNumber = formatNumber;
 exports.getStockPrice = getStockPrice;
 exports.getCurrentDate = getCurrentDate;
+exports.getMarketNews = getMarketNews;
 
 

@@ -1,6 +1,6 @@
 <main>
+    <!--
     <form action="/news" method="post">
-        <h1>Current News</h1>
         <fieldset>
             <legend>Get current news for a company</legend>
             <div>
@@ -9,6 +9,17 @@
             </div>
             <input type="submit">
         </fieldset>
+    </form> -->
+    <div class="news-heading">
+        <a href="/news" id="marketNews">Market News</a>
+        <a href="/companyNews" id="companyNews">Company News</a>
+    </div>
+    <form action="/companyNews" method="post">
+        <div>
+            <label for="company-news">Enter Stock Ticker: </label>
+            <input type="text" name="symbol" id="company-news">
+        </div>
+        <input type="submit">
     </form>
     {{#if displayData}}
         <section>
@@ -27,3 +38,4 @@
         </section>
     {{/if}}
 </main>
+<script src="/scripts/news.js"></script>
