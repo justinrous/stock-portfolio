@@ -23,6 +23,12 @@
      width: 100vw;
  }
 
+ h1 {
+     color: goldenrod;
+     text-shadow: 0 0 0.5px lightgoldenrodyellow;
+     font-size: 2em;
+ }
+
  .stats-section {
      display: flex;
      flex-direction: row;

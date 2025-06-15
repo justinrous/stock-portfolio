@@ -4,19 +4,21 @@ require('dotenv').config();
 const index = require('../index.js');
 
 /*
-// Create a Connection to Database
+// Create a Connection to Local Database in Development
 const pool = mysql.createPool({
-    host: process.env.DB_HOST,
-    user: process.env.DB_USER,
-    password: process.env.DB_PASSWORD,
-    database: process.env.DB_NAME,
+    host: process.env.LOCAL_DB_HOST,
+    user: process.env.LOCAL_DB_USER,
+    password: process.env.LOCAL_DB_PASSWORD,
+    database: process.env.LOCAL_DB_NAME,
     port: 3306,
     waitForConnections: true,
     connectionLimit: 10,
     queueLimit: 0
-}); */
+});
+*/
 
-// Create a Connection to Database
+
+// Create a Connection to Database in Production (Google Cloud SQL)
 const pool = mysql.createPool({
     socketPath: process.env.INSTANCE_CONNECTION_NAME,
     user: process.env.DB_USER,
@@ -26,6 +28,7 @@ const pool = mysql.createPool({
     connectionLimit: 10,
     queueLimit: 0
 });
+
 
 
 
@@ -40,18 +43,6 @@ async function testDatabaseConnection() {
         process.exit(1);
     }
 }
-/*
-async function connectToDatabase() {
-    try {
-        await connection.connect();
-        console.log("Connected to the MySQL server.");
-    } catch (err) {
-        console.error("Error connecting to the database:", err.message);
-        process.exit(1); // optional: exit if critical
-    }
-}
-connectToDatabase(); */
-
 
 async function addUser(user) {
     /*

@@ -11,6 +11,44 @@ body {
 /* ------------------------------------------------------------------------
 ----------------- Main Styles ---------------------------------------------
 -------------------------------------------------------------------------*/
+main {
+    padding: 4em;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+main button {
+    color: lightgoldenrodyellow;
+    padding: 0.5em;
+    margin: 1em;
+    font-size: 1.2em;
+}
+
+.news-heading {
+    display: flex;
+    flex-direction: row;
+    align-items: space-between;
+    margin-bottom: 2em;
+}
+
+.news-heading a {
+    text-decoration: none;
+    color: lightgoldenrodyellow;
+    font-size: 2em;
+    padding: 0 1em;
+}
+
+/* Active and hidden classes style the main header buttons for the news page */
+.news-heading a.active {
+    color: goldenrod;
+    text-shadow: 0 0 1px lightgoldenrodyellow;
+}
+
+.hidden {
+    display: none;
+}
+
 form {
     color: whitesmoke;
     display: flex;
@@ -25,8 +63,8 @@ form h1 {
 form fieldset {
     display: flex;
     flex-direction: column;
-    padding: 1em;
-    margin: 1em;
+    padding: 1em 1em 0 1em;
+    margin: 1em 1em 0 1em;
 }
 
 form legend {
@@ -55,7 +93,6 @@ input[type="submit"]:active {
 section {
     display: flex;
     flex-direction: column;
-    color: whitesmoke;
     align-items: center;
 }
 
@@ -69,15 +106,16 @@ section div {
 
 div .headline {
     color: green;
-    font-size: 1.2em;
+    font-size: 1.5em;
 }
 
 div img {
-    max-width: 100%;
+    max-width: 80%;
 }
 
 div .summary {
-    max-width: 90%;
+    max-width: 80%;
+    color: lightgoldenrodyellow;
 }
 
 section div * {

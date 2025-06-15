@@ -9,7 +9,6 @@ const bcrypt = require('bcrypt');
 const { watch, stat } = require('fs');
 const axios = require('axios');
 const finnhubScript = require('./stock_scripts/finnhubApiScript.js');
-// const redisDB = require('./db/redisClient.js');
 const nodeCache = require('node-cache');
 
 const app = express();
@@ -623,9 +622,42 @@ app.post('/statistics', async (req, res) => {
     }
 })
 
-app.get('/news', (req, res) => {
+app.get('/news', async (req, res) => {
     try {
-        let displayData = null;
+
+        // Check node cache for market news
+        let marketNews = cache.get('marketNews'); // Check if market news exists in cache
+        let displayData = []; // Array to store news objects
+
+        if (!marketNews) {
+            // Get market news from API
+            console.log("Market news not in cache, retrieving from API.");
+            marketNews = await finnhubScript.getMarketNews();
+
+            if (!marketNews || marketNews.length === 0) { // If no market news is available
+                console.log("No market news available.");
+                displayData = null;
+            }
+            else {
+                // Format the news data
+                for (let i = 0; i < 20; i++) {
+                    // displayData[i].datetime = finnhubScript.formatDate(displayData[i].datetime);
+                    let newsObj = {};
+                    newsObj.summary = marketNews[i].summary;
+                    newsObj.headline = marketNews[i].headline;
+                    newsObj.image = marketNews[i].image;
+                    newsObj.url = marketNews[i].url;
+                    displayData.push(newsObj);
+                }
+                // Serialize the market news data to a string and store it in the cache
+                let serializedMarketNews = JSON.stringify(displayData);
+                cache.set('marketNews', serializedMarketNews, 3600); // Cache for 1 hour
+            }
+        }
+        else {
+            console.log("Market news cache hit.");
+            displayData = JSON.parse(marketNews); // Parse the cached data back to an object
+        }
 
         res.render('news', {
             stylesheet: './styles/news.css',
@@ -642,7 +674,23 @@ app.get('/news', (req, res) => {
     }
 })
 
-app.post('/news', async (req, res) => {
+app.get('/companyNews', (req, res) => {
+    try {
+        res.render('news', {
+            stylesheet: './styles/news.css',
+            isLoggedIn: req.session.isLoggedIn,
+            initials: req.session.initials
+        })
+    }
+    catch (err) {
+        res.status(500).render('error', {
+            message: "Oops! Something went wrong on the server.",
+            stylesheet: 'styles/home.css'
+        })
+    }
+});
+
+app.post('/companyNews', async (req, res) => {
     try {
         let symbol = req.body.symbol;
         let to = finnhubScript.getCurrentDate(); // Today's date
