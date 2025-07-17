@@ -194,19 +194,35 @@ app.post('/', async (req, res) => {
         if (!(earnings[0].name)) {
             let companies = []; // Stores company names for each stock reporting earnings
             let companyProfile;
+            console.log("Earnings Length: ", earnings.length);
+            // Get company name for each stock reporting earnings
             for (let i = 0; i < earnings.length; i++) {
                 companyProfile = await finnhubScript.getCompanyProfile(earnings[i].symbol);
-                if (companyProfile && i < 59) { // Limit API calls to 60
+                if (companyProfile) { // Limit API calls to 60
                     earnings[i].name = companyProfile.name;
                     companies.push(companyProfile.name);
                 }
                 else {
-                    break;
+                    // If no company profile is found, wait 60 seconds and then continue after API limit reset
+                    return new Promise((resolve, reject) => {
+                        console.log("No company profile found for symbol: ", earnings[i].symbol);
+                        setTimeout(async () => {
+                            let companyResult = await finnhubScript.getCompanyProfile(earnings[i].symbol);
+                            if (!companyResult) {
+                                console.log("No company profile found for symbol: ", earnings[i].symbol);
+                                reject();
+                            }
+                            else {
+                                earnings[i].name = companyResult.name;
+                                companies.push(companyResult.name);
+                                resolve();
+                            }
+                        }, 1000 * 60); // Wait for 60 seconds
+                    });
                 }
             }
             // Set company names in cache
             cache.set('earnings', JSON.stringify(earnings), 3600); // Cache for 1 hour
-
             res.json(companies); // Send the company names as a response
         }
         else {

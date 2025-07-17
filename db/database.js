@@ -3,7 +3,7 @@ const bcrypt = require('bcrypt');
 require('dotenv').config();
 const index = require('../index.js');
 
-/*
+
 // Create a Connection to Local Database in Development
 const pool = mysql.createPool({
     host: process.env.LOCAL_DB_HOST,
@@ -15,9 +15,9 @@ const pool = mysql.createPool({
     connectionLimit: 10,
     queueLimit: 0
 });
-*/
 
 
+/*
 // Create a Connection to Database in Production (Google Cloud SQL)
 const pool = mysql.createPool({
     socketPath: process.env.INSTANCE_CONNECTION_NAME,
@@ -27,7 +27,7 @@ const pool = mysql.createPool({
     waitForConnections: true,
     connectionLimit: 10,
     queueLimit: 0
-});
+}); */
 
 
 

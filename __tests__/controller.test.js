@@ -100,9 +100,9 @@ describe('Tests for getCurrentDate() function', () => {
         const dateRegex = /^\d{4}-\d{2}-\d{2}$/;  // Regex to match YYYY-MM-DD format
         expect(result).toMatch(dateRegex);
     });
+})
 
 
 /***********************************
  * Tests for GetPreviousDate() function
  * ***********************************/
-
