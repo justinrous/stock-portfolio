@@ -1,5 +1,5 @@
 # Basic GitHub Actions workflow for Node.js project
-name: Node.js CI
+name: Node.js CI Test Suite
 
 on:
   push:
