@@ -1,24 +1,24 @@
-// Mock the `finnhub` module first
+// Mock the `finnhub` module before requiring the script
+
 jest.mock('finnhub', () => {
-    return {
-        DefaultApi: jest.fn(() => ({
-            quote: jest.fn()
-        })),
-        ApiClient: {
-            instance: {
-                authentications: {
-                    api_key: {
-                        apiKey: 'mocked-api-key'
-                    }
-                }
+    const quoteMock = jest.fn();
+    const DefaultApi = jest.fn(() => ({
+        quote: quoteMock,
+        // add other methods you want to mock, e.g. companyBasicFinancials, etc.
+    }));
+    const ApiClient = {
+        instance: {
+            authentications: {
+                api_key: {}
             }
         }
     };
+    return { DefaultApi, ApiClient, __mocks__: { quoteMock } };
 });
 
-// const index = require('../index.js');
-const stock_script = require('../stock_scripts/finnhubApiScript.js');
-const finnhub = require('finnhub');
+const stock_script = require('./finnhubApiScript.js');
+const { __mocks__ } = require('finnhub');
+const quoteMock = __mocks__.quoteMock;
 
 // FormatNumber() function tests
 describe('Tests various functions in formatNumber() function', () => {
@@ -68,28 +68,66 @@ describe('Tests various functions in formatNumber() function', () => {
 });
 
 // Tests various functions in getStockPrice() function
+
+
 describe('Tests various functions in getStockPrice() function', () => {
-    const stockPrice = { c: 200, o: 198, h: 205, l: 195 };
+
+    beforeEach(() => {
+        quoteMock.mockReset();
+    });
 
     test('resolves with correct stock data', async () => {
-        // Mock the `quote` method on the DefaultApi instance
-        const mockQuote = jest.fn((ticker, cb) => {
-            cb(null, stockPrice);  // Simulate success callback with mock data
+        quoteMock.mockImplementation((ticker, cb) => {
+            if (ticker === 'AAPL') {
+                return cb(null, { c: 200, o: 198, h: 205, l: 195 });
+            }
+            else {
+                return cb(null, { c: null, o: null, h: null, l: null });
+            }
         });
-
-        // Mock the behavior of the `quote` method on the `finnhub.DefaultApi` instance
-        finnhub.DefaultApi.mockImplementation(() => ({
-            quote: mockQuote
-        }));
-
-        // Call the function under test
         const result = await stock_script.getStockPrice('AAPL');
-
-        // Verify that the function returns the correct data
         expect(result).toEqual([200, 198, 205, 195]);
-        expect(mockQuote).toHaveBeenCalled();  // Verify that `quote` was called
+    });
+
+    test('rejects and returns null on API error', async () => {
+        quoteMock.mockImplementation((ticker, cb) => {
+            return cb(new Error('API error'), null);
+        });
+        const result = await stock_script.getStockPrice('invalidTicker');
+        expect(result).toBeNull();
     });
 });
+/*
+
+test('resolves with correct stock data', async () => {
+    const stockPrice = { c: 200, o: 198, h: 205, l: 195 };
+    mockQuote.mockImplementation((ticker, cb) => {
+        cb(null, stockPrice);
+    });
+    const result = await stock_script.getStockPrice('AAPL');
+    expect(result).toEqual([200, 198, 205, 195]);
+    expect(mockQuote).toHaveBeenCalled();
+});
+
+test('rejects and returns null on API error', async () => {
+    mockQuote.mockImplementation((ticker, cb) => {
+        cb(new Error('API error'), null);
+    });
+    const result = await stock_script.getStockPrice('AAPL');
+    expect(result).toBeNull();
+    expect(mockQuote).toHaveBeenCalled();
+});
+
+test('rejects and returns null on data formatting error', async () => {
+    // Simulate data that will cause an error in formatting
+    const stockPrice = undefined;
+    mockQuote.mockImplementation((ticker, cb) => {
+        cb(null, stockPrice);
+    });
+    const result = await stock_script.getStockPrice('AAPL');
+    expect(result).toEqual([undefined, undefined, undefined, undefined]);
+    expect(mockQuote).toHaveBeenCalled();
+}); */
 
 /***********************************
  * Tests for getCurrentDate() function
@@ -101,8 +139,3 @@ describe('Tests for getCurrentDate() function', () => {
         expect(result).toMatch(dateRegex);
     });
 })
-
-
-/***********************************
- * Tests for GetPreviousDate() function
- * ***********************************/

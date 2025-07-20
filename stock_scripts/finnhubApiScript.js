@@ -3,7 +3,6 @@ const axios = require('axios');
 require('dotenv').config();
 
 
-// Finnhub Client setup
 const api_key = finnhub.ApiClient.instance.authentications['api_key'];
 api_key.apiKey = process.env.FINNHUB_API_KEY;
 const finnhubClient = new finnhub.DefaultApi();
@@ -58,8 +57,8 @@ async function getStockPrice(ticker) {
         return new Promise((resolve, reject) => {
             finnhubClient.quote(ticker, (err, data, response) => {
                 if (err) {
-                    console.log("Error with API call: ", error);
-                    reject(null);
+                    console.log("Error with API call: ", err);
+                    resolve(null);
                 }
                 else {
                     try {
@@ -72,7 +71,7 @@ async function getStockPrice(ticker) {
                     }
                     catch (err) {
                         console.log("Error formatting data: ", err);
-                        reject(null);
+                        resolve(null);
                     }
                 }
             })
