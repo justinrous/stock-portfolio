@@ -1,8 +1,6 @@
 # Overview
 This is a full-stack financial investment platform that allows users to track a personalized portfolio of stocks, view real-time price data, and access key financial statistics and news for individual companies. Designed with both functionality and user experience in mind, the application integrates data from the FinnHub.io API to provide up-to-date market insights.  
 
-Deployed to GCP [here](https://wise-shell-458721-j1.uw.r.appspot.com/)
-
 ![Statistics Page](https://github.com/justinrous/stock-portfolio/blob/main/public/images/portfolio_manager.JPG)
 ![Portfolio Page](https://github.com/justinrous/stock-portfolio/blob/main/public/images/portfolio_manager1.JPG)
 ![Company News](https://github.com/justinrous/stock-portfolio/blob/main/public/images/portfolio_manager2.JPG)
@@ -26,6 +24,6 @@ The application also integrates with an external financial API to fetch and disp
 
 ### To-do List
 - Improve code coverage of unit tests 
-- 
+- Implement Gain/Loss Section
   
 
